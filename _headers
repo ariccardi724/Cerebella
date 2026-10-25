@@ -1,0 +1,9 @@
+# Netlify settings: always check for a new version of the app and its offline worker
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Content-Type: application/manifest+json

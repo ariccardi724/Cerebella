@@ -1,0 +1,25 @@
+CEREBELLA: FIND YOUR BALANCE - UPLOAD TO NETLIFY
+
+1. Go to app.netlify.com/drop and sign in to your free account (so the site is kept).
+2. Drag this ZIP file onto the page. (If you see "Page not found" afterwards,
+   unzip it and drag the unzipped folder instead.)
+3. When it says the site is published, copy the https://...netlify.app link.
+   Optional: in Site configuration > Change site name, pick a friendlier name,
+   for example cerebella-yourclinic.netlify.app.
+
+ON THE iPad
+4. Open the link in Safari.
+5. Share > Add to Home Screen > Add (leave "Open as Web App" on if shown).
+6. Open Cerebella from the Home Screen icon once on Wi-Fi. After that it works offline.
+
+ON A META QUEST HEADSET (VR)
+7. Put on the headset, open Meta Quest Browser, and go to the same link.
+8. Start a session. On gaze and eye exercises, tap "Enter VR" in the top banner.
+   Sit in a sturdy chair. Trigger or pinch pauses; the grip button leaves VR.
+   Balance exercises are always done without the headset.
+
+UPDATING LATER
+Open your site's Deploys page on Netlify and drag the new zip or folder onto it.
+The link stays the same; iPads update the next time Cerebella is opened online.
+
+Profiles and sessions are stored on each device only and are not uploaded anywhere.
