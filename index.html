@@ -827,6 +827,10 @@ html:not([data-contrast="high"]) .tsw[aria-checked="true"] .knob{background:line
 html:not([data-contrast="high"]) .ring{background:conic-gradient(var(--neo-g),var(--neo-c) calc(var(--p) * .6),var(--neo-v) var(--p),var(--accent-soft) 0)}
 html[data-theme="light"]:not([data-contrast="high"]) .top::after{opacity:.65}
 
+/* v16: the target glows amber just before a strong scene event */
+.stage .demo .target{transition:box-shadow .3s ease, filter .3s ease}
+.stage.evcue .demo .target{box-shadow:0 0 0 5px #ffb347,0 0 34px 12px rgba(255,170,60,.85);filter:saturate(1.2)}
+
 /* balance board test */
 .bchans{margin:10px 0 0;padding-left:18px;font-size:.92rem;color:var(--muted)}
 .bchans code{font-size:.85rem;color:var(--ink)}
@@ -3094,9 +3098,10 @@ function vrFrame(ts, frame){
   if(sessionLive()) vrTrackHead(ry, pitch, dt);
   var gl=VR.gl, layer=VR.session.renderState.baseLayer;
   gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
-  gl.clearColor(0.04,0.08,0.10,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-  if(!sessionLive()) return;
-  var items=vrScene(dt);
+  if(!sessionLive()){ gl.clearColor(0.04,0.08,0.10,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT); return; }
+  VR.clear=null; VR.camPos=[p.x,p.y,p.z];
+  var items=vrScene(dt), cc=VR.clear||[0.04,0.08,0.10];
+  gl.clearColor(cc[0],cc[1],cc[2],1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   for(var i=0;i<pose.views.length;i++){
     var view=pose.views[i], vp=layer.getViewport(view);
     gl.viewport(vp.x,vp.y,vp.width,vp.height);
@@ -3120,8 +3125,18 @@ function vrScene(dt){
       if(vert){ VR.oknOff+=(c.dir==="left"?1:-1)*(sp/360)*(360/sw)*(dt/1000); items.push({buf:"cyl", M:mmul(mT(O[0],O[1],O[2]),mS(5,10,5)), tex:texStripes(true), uvS:[360/sw,1], uvO:[VR.oknOff,0], tint:[1,1,1,1], depth:true}); }
       else { var degPerV=2*Math.atan(1)/D2R*1.0; VR.oknOff+=(c.dir==="up"?-1:1)*(sp/degPerV)*(dt/1000)*(degPerV/sw); items.push({buf:"cyl", M:mmul(mT(O[0],O[1],O[2]),mS(5,10,5)), tex:texStripes(false), uvS:[1,degPerV/sw], uvO:[0,VR.oknOff], tint:[1,1,1,1], depth:true}); }
     } else if(c.demo==="ocular"||c.demo==="gaze"){
-      var scv=sessionScene(), lv=scv?Math.max(2,scv.lv):Math.min(5,sessionBg());   /* themes show as the pattern of the same intensity in VR */
-      if(lv>=2){
+      var scv=sessionScene(), lv=scv?Math.max(2,scv.lv):Math.min(5,sessionBg());   /* themes without a 3D version show as the pattern of the same intensity */
+      if(scv && scv.t==="neural"){                                      /* v16: the 3D nerve tunnel */
+        var nfx=neuralVrFx();
+        items.push({buf:"quad", M:mmul(vrPlace(0,0,85),mS(70,70,1)), tex:texNebula(), uvS:[1,1], uvO:[0,0], tint:[0.7,1,0.9,1], depth:false});
+        var tit=tunItem(scv.lv,dt,running,"neural",nfx); items.push(tit);
+        nfx.cells.forEach(function(cl){ items.push({buf:"quad", M:mmul(mmul(tit.M,mT(cl.x,cl.y,cl.z)),mS(3.6,3.6,1)), tex:texNeuronVR(), uvS:[1,1], uvO:[0,0], tint:[1,1,1,cl.a], depth:false}); });
+        VR.clear=[0.012+nfx.glow*0.3,0.02+nfx.glow*0.4,0.05+nfx.glow*0.4];
+      } else if(scv && scv.t==="stars"){                                       /* v15: a true 3D starfield tunnel */
+        items.push({buf:"quad", M:mmul(vrPlace(0,0,85),mS(70,70,1)), tex:texNebula(), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+        items.push(tunItem(scv.lv,dt,running));
+        VR.clear=[0.008,0.012,0.035];
+      } else if(lv>=2){
         if(lv>=4) VR.bgRot+=(lv===5?6:2.5)*Math.sin(performance.now()/7000)*(dt/1000);   /* slow drifting surround */
         items.push({buf:"cyl", M:mmul(mmul(mT(O[0],O[1],O[2]),mRY((VR.bgRot)*D2R+VR.yaw0)),mS(6,12,6)), tex:texBackground(lv), uvS:[3,1], uvO:[0,0], tint:[1,1,1,1], depth:true});
       }
@@ -3135,6 +3150,7 @@ function vrScene(dt){
       if(t.lettered){ var deg=degPlan().letter; hgt=2*dist*Math.tan(deg*D2R/2)*1.8; w=hgt*2; tex=texLetter(t.glyph); }
       else { var dg=3.0*(P.prefs.size||1); hgt=w=2*dist*Math.tan(dg*D2R/2); tex=texRing(); }
     } else { hgt=w=2*dist*Math.tan(t.deg*D2R/2); tex=t.tex; }
+    if(t.kind==="target" && EVT.cueUntil>EVT.clock){ var cg=Math.max(w,hgt)*2.4; items.push({buf:"quad", M:mmul(vrPlace(t.az,t.el,dist*1.01), mS(cg,cg,1)), tex:texCueGlow(), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }   /* amber warning glow */
     items.push({buf:"quad", M:mmul(vrPlace(t.az,t.el,dist), mS(w,hgt,1)), tex:tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,running||t.kind!=="target"?1:0.45], depth:false});
   });
   /* status panel, fixed in the room below the target */
@@ -3165,6 +3181,7 @@ function vrDraw(items, proj, viewM){
   gl.uniformMatrix4fv(l.Pj,false,proj); gl.uniformMatrix4fv(l.V,false,viewM); gl.uniform1i(l.tex,0); gl.activeTexture(gl.TEXTURE0);
   gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.disable(gl.CULL_FACE);
   items.forEach(function(it){
+    if(it.custom==="tunnel"){ tunDraw(it,proj,viewM); return; }
     var b=VR.buf[it.buf]; gl.bindBuffer(gl.ARRAY_BUFFER,b.b);
     gl.enableVertexAttribArray(l.p); gl.vertexAttribPointer(l.p,3,gl.FLOAT,false,20,0);
     gl.enableVertexAttribArray(l.uv); gl.vertexAttribPointer(l.uv,2,gl.FLOAT,false,20,12);
@@ -3172,6 +3189,310 @@ function vrDraw(items, proj, viewM){
     gl.uniformMatrix4fv(l.M,false,it.M); gl.uniform2fv(l.uvS,it.uvS); gl.uniform2fv(l.uvO,it.uvO); gl.uniform4fv(l.tint,it.tint);
     gl.bindTexture(gl.TEXTURE_2D,it.tex); gl.drawArrays(gl.TRIANGLES,0,b.n);
   });
+}
+
+
+/* ================================================================
+   v15 — 3D STARFIELD TUNNEL (VR)
+   A real 3D tunnel of stars around the viewer, fixed in the room and pointed the
+   way they faced when the exercise began. Stars sit in a cylinder shell (1.2 to 9 m
+   from the axis), stream toward and past the viewer, and wrap round to the far end.
+   One draw call; all motion is done on the graphics chip in the vertex shader, so it
+   stays at the headset's full frame rate on a Quest 2.
+   Speeds match the screen version: the flow 10° from the center, in degrees per
+   second, for a star 3 m from the axis.
+   ================================================================ */
+var TUN={L:90, built:null};
+var TUN_LV={              /* stars, speed at 10° (°/s), streak, rings, roll (°/s) */
+  1:{n:450,  v10:1.5, streak:0,    rings:false, roll:0},
+  2:{n:900,  v10:3,   streak:0,    rings:false, roll:0},
+  3:{n:1300, v10:5,   streak:0,    rings:true,  roll:0},
+  4:{n:1500, v10:8,   streak:0.07, rings:false, roll:0},
+  5:{n:1800, v10:10,  streak:0.08, rings:false, roll:8}
+};
+function mRZ(a){ var m=m4(), c=Math.cos(a), s=Math.sin(a); m[0]=c; m[1]=s; m[4]=-s; m[5]=c; return m; }
+function tunSpeed(lv, theme){ var rm=3, s10=Math.sin(10*D2R); return (theme==="neural"?NEU_LV:TUN_LV)[lv].v10*D2R*rm/(s10*s10); }   /* metres per second */
+function tunInit(){
+  var gl=VR.gl; if(VR.tunProg) return;
+  var vs=[
+    "attribute vec3 aC;attribute vec2 aQ;attribute vec4 aK;attribute vec3 aCol;",
+    "uniform mat4 uM;uniform mat4 uV;uniform mat4 uP;uniform float uT;uniform float uL;uniform vec3 uCam;uniform float uStreak;",
+    "varying vec2 vQ;varying vec3 vCol;varying float vA;varying float vMode;varying float vZ;",
+    "void main(){",
+    "  float z=mod(aC.z+uT,uL)-uL+3.0;",
+    "  if(aK.z>2.5&&aK.z<3.5){",                                            /* axon fiber: a long still line along the tunnel */
+    "    vec3 c3=aC; vec3 ax=vec3(0.0,0.0,1.0); vec3 tc=normalize(uCam-c3); vec3 sd=cross(ax,tc); float sl=length(sd); sd=sl>1e-4?sd/sl:vec3(1.0,0.0,0.0);",
+    "    vec3 w3=c3+sd*aQ.x*aK.x+ax*aQ.y*aK.y; vZ=w3.z; vMode=3.0; vCol=aCol; vQ=aQ; vA=aK.w*smoothstep(-uL+3.0,-uL+30.0,w3.z);",
+    "    gl_Position=uP*uV*uM*vec4(w3,1.0); return;",
+    "  }",
+    "  if(aK.z>3.5){",                                                      /* dendrite segment: its own point, carried along */
+    "    vZ=z; vMode=4.0; vCol=aCol; vQ=aQ; vA=aK.w*smoothstep(-uL+3.0,-uL+25.0,z)*(1.0-smoothstep(0.5,3.0,z));",
+    "    gl_Position=uP*uV*uM*vec4(aC.xy,z,1.0); return;",
+    "  }",
+    "  vZ=z;",                                   /* far end at -L+3, wraps 3 m behind the viewer */
+    "  vec3 c=vec3(aC.xy,z);",
+    "  float fade=smoothstep(-uL+3.0,-uL+25.0,z)*(1.0-smoothstep(0.5,3.0,z));",
+    "  vMode=aK.z; vCol=aCol; vQ=aQ; vA=fade*aK.w;",
+    "  if(aK.z<0.5){",                                                      /* star: a camera-facing glow */
+    "    vec4 vc=uV*uM*vec4(c,1.0); vc.xy+=aQ*aK.x; gl_Position=uP*vc;",
+    "  } else if(aK.z<1.5){",                                               /* streak: stretched along the direction of travel */
+    "    vec3 ax=vec3(0.0,0.0,1.0); vec3 tc=normalize(uCam-c); vec3 sd=cross(ax,tc); float sl=length(sd); sd=sl>1e-4?sd/sl:vec3(1.0,0.0,0.0);",
+    "    vec3 w=c+sd*aQ.x*aK.x+ax*aQ.y*aK.y; gl_Position=uP*uV*uM*vec4(w,1.0);",
+    "  } else {",                                                           /* tunnel ring: real geometry; aQ holds the ring point */
+    "    gl_Position=uP*uV*uM*vec4(aQ.x,aQ.y,z,1.0); vQ=vec2(0.0);",
+    "  }",
+    "}"].join("\n");
+  var fs=[
+    "precision mediump float;varying vec2 vQ;varying vec3 vCol;varying float vA;varying float vMode;varying float vZ;uniform float uWave;uniform float uGlow;",
+    "void main(){",
+    "  float a;",
+    "  if(vMode<0.5){ float d=length(vQ)*2.0; a=clamp(1.0-d,0.0,1.0); a=a*a*(0.6+0.4*a); }",
+    "  else if(vMode<1.5){ float dx=abs(vQ.x)*2.0; a=clamp(1.0-dx,0.0,1.0)*smoothstep(-0.5,0.2,vQ.y); }",
+    "  else if(vMode<2.5){ a=0.55; }",
+    "  else { a=clamp(1.0-abs(vQ.x)*2.0,0.0,1.0); }",
+    "  float wv=exp(-pow((vZ-uWave)/2.2,2.0));",                              /* a signal wave travelling down the tunnel */
+    "  a*=vA; vec3 col=vCol*(1.0+2.2*wv)+vec3(uGlow);",
+    "  a=min(1.0,a*(1.0+1.2*wv)+uGlow*0.5*vA);",
+    "  if(a<0.01) discard; gl_FragColor=vec4(col*a,a);",
+    "}"].join("\n");
+  var pr=gl.createProgram(); gl.attachShader(pr,vrShader(gl,gl.VERTEX_SHADER,vs)); gl.attachShader(pr,vrShader(gl,gl.FRAGMENT_SHADER,fs)); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+  VR.tunProg=pr;
+  VR.tunLoc={aC:gl.getAttribLocation(pr,"aC"),aQ:gl.getAttribLocation(pr,"aQ"),aK:gl.getAttribLocation(pr,"aK"),aCol:gl.getAttribLocation(pr,"aCol"),
+    uM:gl.getUniformLocation(pr,"uM"),uV:gl.getUniformLocation(pr,"uV"),uP:gl.getUniformLocation(pr,"uP"),uT:gl.getUniformLocation(pr,"uT"),uL:gl.getUniformLocation(pr,"uL"),uCam:gl.getUniformLocation(pr,"uCam"),uWave:gl.getUniformLocation(pr,"uWave"),uGlow:gl.getUniformLocation(pr,"uGlow")};
+}
+/* build the star geometry for one level: 6 vertices per star, 12 floats per vertex */
+function tunBuild(lv, theme){
+  if(theme==="neural") return tunBuildNeural(lv);
+  var gl=VR.gl, cfg=TUN_LV[lv], L=TUN.L, data=[], cols=[[1,1,1],[1,1,1],[0.81,0.89,1],[1,0.95,0.79],[0.75,0.91,1]];
+  var corners=[[-.5,-.5],[.5,-.5],[.5,.5],[-.5,-.5],[.5,.5],[-.5,.5]];
+  var spd=tunSpeed(lv), sLen=cfg.streak?Math.max(0.4,spd*cfg.streak):0;
+  for(var i=0;i<cfg.n;i++){
+    var a=Math.random()*2*Math.PI, r=Math.sqrt(1.44+Math.random()*(81-1.44)), z=Math.random()*L;   /* even density across the shell */
+    var x=r*Math.cos(a), y=r*Math.sin(a), col=cols[i%cols.length], bright=0.55+Math.random()*0.45;
+    var streak=sLen>0 && Math.random()<0.8, size=streak?0.035+Math.random()*0.03:0.06+Math.random()*0.08, mode=streak?1:0;
+    for(var q=0;q<6;q++){ var cq=corners[q]; data.push(x,y,z, cq[0],cq[1], size,sLen,mode,bright, col[0],col[1],col[2]); }
+  }
+  if(cfg.rings){                                                       /* glowing rings every 9 m: a tunnel to fly through */
+    var segs=72, rr=3.6, wdt=0.05;
+    for(var zr=0;zr<L;zr+=9){
+      for(var s=0;s<segs;s++){
+        var a0=s/segs*2*Math.PI, a1=(s+1)/segs*2*Math.PI;
+        var p=function(aa,rad){ return [rad*Math.cos(aa),rad*Math.sin(aa)]; };
+        var A=p(a0,rr-wdt),B=p(a1,rr-wdt),C=p(a1,rr+wdt),D=p(a0,rr+wdt), ringCol=s%2?[0.47,0.78,1]:[0.75,0.6,1];
+        [A,B,C,A,C,D].forEach(function(v){ data.push(0,0,zr, v[0],v[1], 0,0,2,1, ringCol[0],ringCol[1],ringCol[2]); });
+      }
+    }
+  }
+  var buf=VR.tunBuf||gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);
+  VR.tunBuf=buf; VR.tunN=data.length/12; TUN.built="stars|"+lv;
+}
+/* the inside of a nerve: still axon fibers along the walls, signals racing along them,
+   dendrites branching from the wall, and myelin sheath rings from level 3 */
+var NEU_LV={1:{fib:60,sig:220,den:40,rings:false,roll:0,v10:1.5},2:{fib:80,sig:420,den:60,rings:false,roll:0,v10:3},3:{fib:100,sig:620,den:80,rings:true,roll:0,v10:5},
+            4:{fib:110,sig:800,den:90,rings:true,roll:0,v10:8},5:{fib:120,sig:950,den:100,rings:true,roll:8,v10:10}};
+function tunBuildNeural(lv){
+  var gl=VR.gl, cfg=NEU_LV[lv], L=TUN.L, data=[], NEO=[[0.24,0.96,0.65],[0.22,0.78,1],[0.6,0.42,1],[0.31,0.49,1]];
+  var corners=[[-.5,-.5],[.5,-.5],[.5,.5],[-.5,-.5],[.5,.5],[-.5,.5]], fibers=[];
+  var spd=tunSpeed(lv,"neural"), sLen=Math.max(0.35,spd*0.07);
+  for(var i=0;i<cfg.fib;i++){                                           /* axon fibers on the tunnel wall */
+    var a=i/cfg.fib*2*Math.PI+R(-0.02,0.02), r=R(2.6,5.5), col=NEO[i%NEO.length]; fibers.push([a,r]);
+    for(var q=0;q<6;q++){ var cq=corners[q]; data.push(r*Math.cos(a),r*Math.sin(a),-L/2+3, cq[0],cq[1], 0.025+Math.random()*0.02,L,3,0.45, col[0],col[1],col[2]); }
+  }
+  for(i=0;i<cfg.sig;i++){                                               /* electrical signals riding the fibers */
+    var fb=fibers[Math.floor(Math.random()*fibers.length)], z=Math.random()*L, sc=Math.random()<0.5?[0.24,0.96,0.65]:[0.6,0.95,1];
+    for(q=0;q<6;q++){ cq=corners[q]; data.push(fb[1]*0.985*Math.cos(fb[0]),fb[1]*0.985*Math.sin(fb[0]),z, cq[0],cq[1], 0.06,sLen,1,0.95, sc[0],sc[1],sc[2]); }
+  }
+  for(i=0;i<cfg.den;i++){                                               /* dendrites: branching on the wall */
+    var da=Math.random()*2*Math.PI, dr=R(3.2,6.5), dz=Math.random()*L, dcol=Math.random()<0.6?[0.55,0.4,1]:[0.31,0.55,1];
+    var grow=function(aa,zz,dir,len,wd,depth){
+      var a2=aa+Math.sin(dir)*len/dr, z2=zz+Math.cos(dir)*len;
+      var p1=[dr*Math.cos(aa),dr*Math.sin(aa),zz], p2=[dr*Math.cos(a2),dr*Math.sin(a2),z2];
+      var dx=p2[0]-p1[0], dy=p2[1]-p1[1], dzz=p2[2]-p1[2], rx=Math.cos(aa), ry=Math.sin(aa);           /* side vector lying in the wall */
+      var nx=dy*0-dzz*ry, ny=dzz*rx-dx*0, nz=dx*ry-dy*rx, nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1; nx*=wd/nl; ny*=wd/nl; nz*=wd/nl;
+      var A=[p1[0]-nx,p1[1]-ny,p1[2]-nz],B=[p1[0]+nx,p1[1]+ny,p1[2]+nz],C=[p2[0]+nx*0.6,p2[1]+ny*0.6,p2[2]+nz*0.6],Dd=[p2[0]-nx*0.6,p2[1]-ny*0.6,p2[2]-nz*0.6];
+      [A,B,C,A,C,Dd].forEach(function(v,ix){ data.push(v[0],v[1],((v[2]%L)+L)%L, ix===1||ix===2?0.5:-0.5,0, 0,0,4,0.6, dcol[0],dcol[1],dcol[2]); });
+      if(depth>0){ var nb=Math.random()<0.6?2:3; for(var b=0;b<nb;b++) grow(a2,z2,dir+R(-0.9,0.9),len*R(0.55,0.75),wd*0.65,depth-1); }
+    };
+    grow(da,dz,R(0,2*Math.PI),R(0.6,1.2),0.05,3);
+  }
+  if(cfg.rings){                                                        /* myelin sheath: wide glowing bands every 7 m */
+    var segs=72, rr=2.45, wdt=0.16;
+    for(var zr=0;zr<L;zr+=7){
+      for(var s2=0;s2<segs;s2++){
+        var a0=s2/segs*2*Math.PI, a1=(s2+1)/segs*2*Math.PI, pt=function(aa,rad){ return [rad*Math.cos(aa),rad*Math.sin(aa)]; };
+        var P1=pt(a0,rr-wdt),P2=pt(a1,rr-wdt),P3=pt(a1,rr+wdt),P4=pt(a0,rr+wdt), rc=s2%3?[0.6,0.42,1]:[0.22,0.78,1];
+        [P1,P2,P3,P1,P3,P4].forEach(function(v){ data.push(0,0,zr, v[0],v[1], 0,0,2,0.8, rc[0],rc[1],rc[2]); });
+      }
+    }
+  }
+  var buf=VR.tunBuf||gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);
+  VR.tunBuf=buf; VR.tunN=data.length/12; TUN.built="neural|"+lv;
+}
+/* the tunnel item for this frame (advances the motion while the exercise runs) */
+function tunItem(lv, dt, running, theme, fx){
+  theme=theme||"stars"; fx=fx||{}; tunInit(); if(TUN.built!==theme+"|"+lv) tunBuild(lv,theme);
+  var cfg=(theme==="neural"?NEU_LV:TUN_LV)[lv];
+  if(running){ VR.tunT=((VR.tunT||0)+tunSpeed(lv,theme)*(fx.rate||1)*dt/1000)%TUN.L; VR.tunRoll=((VR.tunRoll||0)+cfg.roll*dt/1000)%360; }
+  var O=VR.origin, roll=(VR.tunRoll||0)*D2R, yaw=VR.yaw0+(fx.veer||0);
+  var M=mmul(mmul(mT(O[0],O[1],O[2]),mRY(yaw)),mRZ(roll));
+  /* the viewer's position in tunnel space (for streaks that turn to face them) */
+  var p=VR.camPos||O, dx=p[0]-O[0], dy=p[1]-O[1], dz=p[2]-O[2], c=Math.cos(yaw), s=Math.sin(yaw);
+  var tx=c*dx-s*dz, tz=s*dx+c*dz, cr=Math.cos(-roll), sr=Math.sin(-roll);
+  return {custom:"tunnel", M:M, cam:[cr*tx-sr*dy, sr*tx+cr*dy, tz], wave:fx.wave, glow:fx.glow};
+}
+function tunDraw(it, proj, viewM){
+  var gl=VR.gl, l=VR.tunLoc; gl.useProgram(VR.tunProg);
+  gl.bindBuffer(gl.ARRAY_BUFFER,VR.tunBuf);
+  var st=48;
+  gl.enableVertexAttribArray(l.aC); gl.vertexAttribPointer(l.aC,3,gl.FLOAT,false,st,0);
+  gl.enableVertexAttribArray(l.aQ); gl.vertexAttribPointer(l.aQ,2,gl.FLOAT,false,st,12);
+  gl.enableVertexAttribArray(l.aK); gl.vertexAttribPointer(l.aK,4,gl.FLOAT,false,st,20);
+  gl.enableVertexAttribArray(l.aCol); gl.vertexAttribPointer(l.aCol,3,gl.FLOAT,false,st,36);
+  gl.uniformMatrix4fv(l.uM,false,it.M); gl.uniformMatrix4fv(l.uV,false,viewM); gl.uniformMatrix4fv(l.uP,false,proj);
+  gl.uniform1f(l.uT,VR.tunT||0); gl.uniform1f(l.uL,TUN.L); gl.uniform3fv(l.uCam,it.cam);
+  gl.uniform1f(l.uWave,it.wave==null?-999:it.wave); gl.uniform1f(l.uGlow,it.glow||0);
+  gl.disable(gl.DEPTH_TEST); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);   /* premultiplied glow */
+  gl.drawArrays(gl.TRIANGLES,0,VR.tunN);
+  gl.disableVertexAttribArray(l.aK); gl.disableVertexAttribArray(l.aCol);
+  gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.useProgram(VR.prog);
+}
+
+/* ================================================================
+   v16 — SCENE EVENTS (shared by every background theme)
+   Random events every 15–30 s of exercise time. Strong events (turns, forks,
+   jumps, reversals...) are announced first by the target glowing amber for
+   1.3 s. The clock only runs while the exercise runs, so pausing freezes it.
+   Each theme lists its events per level; the screen version and the VR version
+   both read the same event state, so they always match.
+   ================================================================ */
+var EVT={clock:0, next:0, cueUntil:0, pending:null, act:[], key:null};
+var SCENE_EVENTS={
+  neural:function(lv){ return lv>=4 ? ["cells","wave","fork","jump"] : lv>=3 ? ["cells","wave"] : []; }
+};
+var EVT_STRONG={fork:1, jump:1};
+var EVT_DUR={cells:5200, wave:1600, fork:3400, jump:2600};
+var EVT_CUE=1300;
+function evtGap(){ return R(15,30)*1000; }
+function evtReset(){ EVT.clock=0; EVT.next=evtGap(); EVT.cueUntil=0; EVT.pending=null; EVT.act=[]; evtCue(false); }
+function evtCue(on){ var st=$("#stage"); if(st) st.classList.toggle("evcue",!!on); }
+function evtActive(type){ for(var i=0;i<EVT.act.length;i++) if(EVT.act[i].type===type) return EVT.act[i]; return null; }
+/* progress 0..1 of an active event, or -1 */
+function evtProg(ev){ return ev ? Math.max(0,Math.min(1,(EVT.clock-ev.t0)/ev.dur)) : -1; }
+function evtTick(){
+  var s=S.sess, sc=s?sessionScene():null, key=sc ? sc.t+"|"+sc.lv+"|"+s.i : null;
+  if(key!==EVT.key){ EVT.key=key; evtReset(); }
+  if(!sc || s.phase!=="run" || s.paused) return;
+  var pool=(SCENE_EVENTS[sc.t]||function(){ return []; })(sc.lv); if(!pool.length) return;
+  EVT.clock+=100;
+  EVT.act=EVT.act.filter(function(a){ return EVT.clock<a.t0+a.dur; });
+  if(EVT.pending && EVT.clock>=EVT.pending.t0){ var ev=EVT.pending; EVT.pending=null; evtCue(false); EVT.act.push(ev); evtFire2D(ev); }
+  if(!EVT.pending && EVT.clock>=EVT.next){
+    var type=pick(pool), strong=!!EVT_STRONG[type];
+    var e2={type:type, dir:Math.random()<0.5?-1:1, t0:EVT.clock+(strong?EVT_CUE:0), dur:EVT_DUR[type], lv:sc.lv, n:sc.lv>=4?2+Math.floor(Math.random()*2):1};
+    if(strong){ EVT.cueUntil=e2.t0; evtCue(true); }
+    EVT.pending=e2; EVT.next=e2.t0+e2.dur+evtGap();
+  }
+}
+setInterval(evtTick,100);
+/* run the screen version of an event, if the screen is showing that theme */
+function evtFire2D(ev){
+  var sc=sessionScene(), box=$("#bgfx"); if(!sc||!box||!box._sc) return;
+  if((box.getAttribute("data-k")||"").indexOf("scene|"+sc.t+"|")!==0) return;
+  var h=SCENE_EVENT_2D[sc.t]; if(h) try{ h(box,ev); }catch(e){ console.error(e); }
+}
+/* a one-off animation that removes itself when done (and pauses with the exercise) */
+function A1(el, frames, opts){
+  var a=el.animate(frames, Object.assign({iterations:1, fill:"forwards"}, opts||{}));
+  LITE.anims.push(a); if(LITE.paused) a.pause();
+  a.onfinish=function(){ if(el.parentNode) el.parentNode.removeChild(el); var i=LITE.anims.indexOf(a); if(i>=0) LITE.anims.splice(i,1); };
+  return a;
+}
+/* smoothly change the speed of the flowing layers (a surge) */
+function flowRate(box, keys, ms){
+  var flow=(box._sc&&box._sc.flow)||[], t0=null, step=function(ts){
+    if(!box._sc || box._sc.flow!==flow) return;
+    if(LITE.paused){ requestAnimationFrame(step); return; }
+    if(t0===null) t0=ts; var p=Math.min(1,(ts-t0)/ms), r=keys(p);
+    flow.forEach(function(a){ try{ a.playbackRate=r; }catch(e){} });
+    if(p<1) requestAnimationFrame(step); else flow.forEach(function(a){ try{ a.playbackRate=1; }catch(e){} });
+  };
+  requestAnimationFrame(step);
+}
+
+/* ---------- Neural matrix: screen versions of the events ---------- */
+function neuronSprite(k, s){
+  var o=mkc(s,s,k), g=o.g, c=s/2, col=pick(["#3df5a6","#38c8ff","#9a6bff"]);
+  g.shadowColor=col; g.shadowBlur=s*0.04; g.strokeStyle=col; g.lineCap="round";
+  var branch=function(x,y,a,len,w,d){ var x2=x+len*Math.cos(a), y2=y+len*Math.sin(a); g.lineWidth=w; g.globalAlpha=0.75; g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo((x+x2)/2+R(-len,len)*0.25,(y+y2)/2+R(-len,len)*0.25,x2,y2); g.stroke();
+    if(d>0) for(var b=0;b<2;b++) branch(x2,y2,a+R(-0.7,0.7),len*R(0.5,0.7),w*0.6,d-1); };
+  for(var i=0;i<7;i++) branch(c,c,i*2*Math.PI/7+R(-0.3,0.3),s*R(0.12,0.18),s*0.022,3);
+  g.globalAlpha=0.9; g.lineWidth=s*0.03; g.beginPath(); g.moveTo(c,c); g.bezierCurveTo(c+s*0.1,c+s*0.2,c-s*0.1,c+s*0.35,c+s*0.02,c+s*0.48); g.stroke();   /* axon */
+  var gr=g.createRadialGradient(c,c,0,c,c,s*0.11); gr.addColorStop(0,"#eafffa"); gr.addColorStop(0.45,col); gr.addColorStop(1,"rgba(0,0,0,0)");
+  g.globalAlpha=1; g.shadowBlur=0; g.fillStyle=gr; g.beginPath(); g.arc(c,c,s*0.11,0,2*Math.PI); g.fill();
+  return o.c;
+}
+var SCENE_EVENT_2D={
+  neural:function(box, ev){
+    var sc=box._sc, W=sc.W, H=sc.H, D=Math.sqrt(W*W+H*H), k=sc.k, root=sc.world;
+    if(ev.type==="cells"){                                             /* nerve cells drifting past */
+      for(var i=0;i<ev.n;i++){
+        var s=Math.round(Math.min(W,H)*0.5), el=put(root,neuronSprite(k,s),W/2-s/2,H/2-s/2), a=R(0,2*Math.PI), r0=D*0.03, r1=D*R(0.55,0.75);
+        A1(el,[{opacity:0,transform:"translate("+(r0*Math.cos(a)).toFixed(0)+"px,"+(r0*Math.sin(a)).toFixed(0)+"px) scale(.08) rotate(0deg)"},
+               {opacity:0.9,offset:0.3,transform:"translate("+(r1*0.25*Math.cos(a)).toFixed(0)+"px,"+(r1*0.25*Math.sin(a)).toFixed(0)+"px) scale(.35) rotate(20deg)"},
+               {opacity:0,transform:"translate("+(r1*Math.cos(a)).toFixed(0)+"px,"+(r1*Math.sin(a)).toFixed(0)+"px) scale(2.2) rotate(50deg)"}],
+          {duration:ev.dur*R(0.75,1), delay:i*700, easing:"ease-in"});
+      }
+    } else if(ev.type==="wave"){                                       /* a signal wave racing toward you */
+      for(var q=0;q<2;q++){
+        var Rd=Math.round(D*0.5), ro=mkc(Rd,Rd,k), g=ro.g, rc=Rd/2, gr=g.createRadialGradient(rc,rc,Rd*0.36,rc,rc,Rd*0.49);
+        gr.addColorStop(0,"rgba(61,245,166,0)"); gr.addColorStop(0.6,"rgba(120,255,220,.75)"); gr.addColorStop(0.85,"rgba(56,200,255,.55)"); gr.addColorStop(1,"rgba(56,200,255,0)");
+        g.fillStyle=gr; g.beginPath(); g.arc(rc,rc,Rd*0.49,0,2*Math.PI); g.arc(rc,rc,Rd*0.36,0,2*Math.PI,true); g.fill();
+        var re=put(root,ro.c,W/2-Rd/2,H/2-Rd/2);
+        A1(re,[{opacity:0,transform:"scale(.05)"},{opacity:1,offset:0.4,transform:"scale(.6)"},{opacity:0,transform:"scale(2.6)"}],{duration:ev.dur, delay:q*260, easing:"cubic-bezier(.55,0,1,.45)"});
+      }
+    } else if(ev.type==="fork"){                                       /* the nerve splits; you veer down one branch */
+      var bs=Math.round(Math.min(W,H)*0.9), bo=mkc(bs,bs,k), bg=bo.g, bc=bs/2;
+      [-1,1].forEach(function(sd){ var x=bc+sd*bs*0.2, gr2=bg.createRadialGradient(x,bc,0,x,bc,bs*0.17); gr2.addColorStop(0,"rgba(5,8,25,.95)"); gr2.addColorStop(0.75,"rgba(40,30,110,.6)"); gr2.addColorStop(1,"rgba(154,107,255,0)");
+        bg.fillStyle=gr2; bg.beginPath(); bg.arc(x,bc,bs*0.17,0,2*Math.PI); bg.fill(); bg.strokeStyle="rgba(56,200,255,.7)"; bg.lineWidth=3; bg.beginPath(); bg.arc(x,bc,bs*0.15,0,2*Math.PI); bg.stroke(); });
+      bg.fillStyle="rgba(154,107,255,.35)"; bg.beginPath(); bg.ellipse(bc,bc,bs*0.03,bs*0.14,0,0,2*Math.PI); bg.fill();
+      var fe=put(root,bo.c,W/2-bs/2,H/2-bs/2);
+      A1(fe,[{opacity:0,transform:"scale(.1)"},{opacity:1,offset:0.35,transform:"scale(.55)"},{opacity:0,transform:"translateX("+(-ev.dir*W*0.7).toFixed(0)+"px) scale(3)"}],{duration:ev.dur, easing:"ease-in"});
+      var sx=ev.dir*W*0.22;
+      A1(root,[{transform:"none"},{offset:0.3,transform:"none"},{offset:0.65,transform:"translateX("+(-sx).toFixed(0)+"px) rotate("+(ev.dir*5)+"deg)"},{transform:"none"}],{duration:ev.dur, easing:"ease-in-out", fill:"none"}).onfinish=null;
+    } else if(ev.type==="jump"){                                       /* reach the synapse, surge across the gap into the next nerve */
+      var ms=Math.round(Math.min(W,H)*0.8), mo=mkc(ms,ms,k), mg=mo.g, mc=ms/2;
+      var mgr=mg.createRadialGradient(mc,mc,0,mc,mc,mc); mgr.addColorStop(0,"rgba(230,255,250,.85)"); mgr.addColorStop(0.3,"rgba(61,245,166,.5)"); mgr.addColorStop(1,"rgba(56,200,255,0)");
+      mg.fillStyle=mgr; mg.beginPath(); mg.arc(mc,mc,mc,0,2*Math.PI); mg.fill();
+      for(var v=0;v<30;v++){ var va=R(0,6.28), vr=mc*R(0.15,0.6); mg.fillStyle="rgba(255,255,255,.8)"; mg.beginPath(); mg.arc(mc+vr*Math.cos(va),mc+vr*Math.sin(va),R(2,5),0,2*Math.PI); mg.fill(); }   /* vesicles */
+      var je=put(root,mo.c,W/2-ms/2,H/2-ms/2);
+      A1(je,[{opacity:0,transform:"scale(.1)"},{opacity:0.9,offset:0.45,transform:"scale(.9)"},{opacity:0,transform:"scale(3.2)"}],{duration:ev.dur, easing:"ease-in"});
+      var veil=document.createElement("div"); veil.style.cssText="width:"+W+"px;height:"+H+"px;background:radial-gradient(circle at 50% 50%,rgba(220,255,248,.75),rgba(56,200,255,.25) 70%,rgba(56,200,255,0))";
+      put(box,veil,0,0);
+      A1(veil,[{opacity:0},{opacity:0,offset:0.35},{opacity:0.55,offset:0.55},{opacity:0}],{duration:ev.dur, easing:"ease-in-out"});   /* soft, single brightening: never a flash */
+      flowRate(box,function(p){ return 1+2.2*Math.sin(Math.PI*p); },ev.dur);
+    }
+  }
+};
+
+/* ---------- Neural matrix in VR: event values for the 3D tunnel ---------- */
+function neuralVrFx(){
+  var fx={wave:-999, veer:0, rate:1, glow:0, cells:[]}, L=TUN.L;
+  var w=evtActive("wave"); if(w){ var p=evtProg(w); fx.wave=(-L+3)+(L-1)*Math.pow(p,1.6); }
+  var f=evtActive("fork"); if(f){ var pf=evtProg(f); fx.veer=f.dir*28*D2R*Math.sin(Math.PI*Math.max(0,(pf-0.25)/0.75)); }
+  var j=evtActive("jump"); if(j){ var pj=evtProg(j); fx.rate=1+2.2*Math.sin(Math.PI*pj); fx.glow=0.32*Math.pow(Math.sin(Math.PI*pj),3); }
+  var c=evtActive("cells"); if(c){ var pc=evtProg(c); if(!c.vr){ c.vr=[]; for(var i=0;i<c.n;i++){ var a=Math.random()*6.28; c.vr.push({a:a, r:R(2.2,4.5), lag:i*0.15}); } }
+    c.vr.forEach(function(cv){ var q=(pc-cv.lag)/(1-cv.lag); if(q>0&&q<1) fx.cells.push({x:cv.r*Math.cos(cv.a), y:cv.r*Math.sin(cv.a), z:-60+62*q, a:Math.min(1,q*4)*Math.min(1,(1-q)*6)}); }); }
+  return fx;
+}
+function texNeuronVR(){ return vrCanvasTex("neuron",512,512,function(g,w){ g.clearRect(0,0,w,w); var src=neuronSprite(1,w); g.drawImage(src,0,0,w,w); },"n"); }
+function texCueGlow(){ return vrCanvasTex("cueglow",256,256,function(g,w,h){ g.clearRect(0,0,w,h); var gr=g.createRadialGradient(w/2,h/2,w*0.18,w/2,h/2,w/2); gr.addColorStop(0,"rgba(255,180,70,.95)"); gr.addColorStop(0.5,"rgba(255,150,40,.45)"); gr.addColorStop(1,"rgba(255,150,40,0)"); g.fillStyle=gr; g.fillRect(0,0,w,h); },"n"); }
+
+/* a soft nebula glow at the far end of the tunnel */
+function texNebula(){
+  return vrCanvasTex("nebula",512,512,function(g,w,h){ g.clearRect(0,0,w,h);
+    var gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2); gr.addColorStop(0,"rgba(130,170,255,.55)"); gr.addColorStop(0.35,"rgba(70,60,170,.28)"); gr.addColorStop(1,"rgba(10,10,40,0)");
+    g.fillStyle=gr; g.fillRect(0,0,w,h); }, "n");
 }
 
 /* ---------- events ---------- */
@@ -3415,7 +3736,7 @@ var THEMES = {
   classic:{name:"Patterns", blurb:"Abstract patterns, from none up to Extreme. Follows the original background levels."},
   grocery:{name:"Grocery aisle", blurb:"Store shelves slide past from side to side, like walking down an aisle. Challenges side-to-side visual flow.",
     lv:{1:"Still shelves",2:"Slow stroll",3:"Steady walk",4:"Busy store",5:"Rushing through"}},
-  stars:{name:"Starfield tunnel", blurb:"Stars stream out from the center, giving a feeling of moving forward. Challenges the sense of self-motion from vision alone.",
+  stars:{name:"Starfield tunnel", blurb:"Stars stream out from the center, giving a feeling of moving forward. Challenges the sense of self-motion from vision alone. In VR it becomes a true 3D tunnel of stars all around you.",
     lv:{1:"Gentle drift",2:"Cruising",3:"Tunnel",4:"Hyperspace",5:"Spinning hyperspace"}},
   street:{name:"Busy crosswalk", blurb:"A street seen from above, with cars, bikes, and people moving in different directions and at different speeds. Challenges unpredictable movement.",
     lv:{1:"Quiet street",2:"Light traffic",3:"Two-way traffic",4:"Busy junction",5:"Rush hour"}},
@@ -3427,11 +3748,11 @@ var THEMES = {
     lv:{1:"Slow escalator",2:"Steady ride",3:"Busy escalator",4:"Up and down",5:"Rush hour stairs"}},
   feed:{name:"Screen scroll", blurb:"Social-style feeds, sliding tiles, and pop-up cards, like a busy phone or tablet screen. Challenges scrolling text and busy layouts.",
     lv:{1:"One slow feed",2:"Steady scrolling",3:"Several speeds",4:"Sliding tiles",5:"Pop-ups"}},
-  forest:{name:"Forest walk", blurb:"Layers of trees drift past at different speeds, as on a walk through the woods. Challenges depth motion in a calmer, natural setting.",
+  forest:{name:"Forest walk", blurb:"Walking forward down a woodland path: trees come toward you and pass on both sides, nearer ones faster. Challenges depth and forward motion in a calmer, natural setting.",
     lv:{1:"Misty stroll",2:"Easy walk",3:"Falling leaves",4:"Breezy",5:"Windy woods"}},
   illusion:{name:"Optical-illusion waves", blurb:"Rippling checkerboards, then still patterns that only seem to move. Challenges perceived-motion conflict and tolerance of visual discomfort.",
     lv:{1:"Soft ripples",2:"Rolling ripples",3:"Bold ripples",4:"Drifting discs",5:"Strong illusions"}},
-  neural:{name:"Neural matrix", blurb:"A journey down the inside of a nerve: axon fibers, branching dendrites and myelin, with electrical signals racing past and dispersing. Challenges forward self-motion, like the starfield, in a calmer palette.",
+  neural:{name:"Neural matrix", blurb:"A journey down the inside of a nerve: axon fibers, branching dendrites and myelin, with electrical signals racing past. From level 3, nerve cells drift by and signal waves race toward you; from level 4 the nerve forks and you jump across synapses. The target glows amber just before a fork or jump. Fully 3D in VR.",
     lv:{1:"Resting nerve",2:"Gentle impulses",3:"Myelin tunnel",4:"Fast conduction",5:"Signal storm"}}
 };
 var THEME_ORDER = ["classic","grocery","stars","neural","street","tilt","boat","stairs","feed","forest","illusion"];
@@ -4130,11 +4451,13 @@ function sceneFeed(box, lv, tier, W, H, ppd){
   }
 }
 
-/* ================= 9. FOREST WALK (depth motion, natural setting) =================
-   Layers of trees slide past at speeds set by their distance: the nearest layer
-   moves at the stated speed and farther layers more slowly (motion parallax).
-   Gentle levels are misty and low in contrast; higher levels add falling leaves,
-   then branches swaying in the wind. */
+/* ================= 9. FOREST WALK (forward motion, natural setting) =================
+   Walking forward down a woodland path. Trees, grass, stones and ferns are placed in
+   real perspective (metres from the viewer) and come toward you, growing and moving
+   outward as they pass, so nearer things move faster, as they do on a real walk.
+   Gentle levels are misty, slow and low in contrast; higher levels walk faster and add
+   falling leaves, then branches swaying and leaves gusting in the wind. The older
+   sideways layer drawing (forestLayer) is kept for reference but no longer used. */
 function fogc(c, f){ var a=hx(c), b=[207,220,214]; return T("#"+[0,1,2].map(function(i){ return ("0"+Math.round(a[i]+(b[i]-a[i])*f).toString(16)).slice(-2); }).join("")); }
 function forestLayer(g, w, h, period, depth, fog, groundY){
   var wrapDraw=function(x, fn){ var sd=newSeed(); for(var m=-1;m*period<w+period;m++) withSeed(sd,function(){ fn(x+m*period); }); };
@@ -4180,37 +4503,94 @@ function branchSprite(k, w, h, left){
     g.fillStyle=T(pick(["#3f7d3a","#4f8f45","#2f6a30","#5d9b4e"])); g.beginPath(); g.arc(x,y,h*R(0.07,0.14),0,2*Math.PI); g.fill(); }
   return o.c;
 }
+/* a single tree drawn standing on its base, for the forward walk */
+function treeSprite(k, w, h, conifer, fog){
+  var o=mkc(w,h,k), g=o.g, cx=w/2, tw=w*R(0.07,0.11);
+  var gr=g.createLinearGradient(cx-tw/2,0,cx+tw/2,0); gr.addColorStop(0,fogc("#3e2c1e",fog)); gr.addColorStop(0.45,fogc("#7a5a3c",fog)); gr.addColorStop(1,fogc("#352518",fog));
+  if(conifer){
+    g.fillStyle=gr; g.fillRect(cx-tw/2,h*0.55,tw,h*0.45);
+    for(var t=0;t<6;t++){ var y0=h*(0.02+t*0.12), y1=h*(0.26+t*0.12), half=w*(0.14+t*0.06), pts=[[cx,y0]], n=7;   /* tiers with a ragged, needle-like lower edge */
+      for(var e=0;e<=n;e++){ var ex=cx+half-2*half*e/n; pts.push([ex,y1-(e%2?h*0.03:0)]); }
+      poly(g,pts,fogc(t%2?"#2e6b44":"#25593a",fog));
+      g.strokeStyle=fogc("#3f8257",fog); g.lineWidth=Math.max(1,w*0.01); g.beginPath(); g.moveTo(cx,y0+h*0.02); g.lineTo(cx-half*0.7,y1-h*0.02); g.stroke(); }
+  } else {
+    g.fillStyle=gr; g.beginPath(); g.moveTo(cx-tw*0.5,h); g.lineTo(cx-tw*0.32,h*0.28); g.lineTo(cx+tw*0.32,h*0.28); g.lineTo(cx+tw*0.5,h); g.closePath(); g.fill();
+    g.strokeStyle=fogc("#2a1d13",fog); g.lineWidth=Math.max(1,tw*0.06);
+    for(var b=h*0.35;b<h;b+=tw*R(0.8,1.6)){ g.beginPath(); g.moveTo(cx-tw*0.25,b); g.lineTo(cx-tw*0.05,b+tw*0.5); g.stroke(); }
+    g.strokeStyle=gr; g.lineWidth=tw*0.35; g.lineCap="round";
+    [[-1,0.42],[1,0.36],[-1,0.3]].forEach(function(br){ g.beginPath(); g.moveTo(cx,h*br[1]); g.quadraticCurveTo(cx+br[0]*w*0.15,h*(br[1]-0.06),cx+br[0]*w*0.3,h*(br[1]-0.14)); g.stroke(); });
+    var greens=["#3f7d3a","#4f8f45","#2f6a30","#5d9b4e"];
+    for(var q=0;q<14;q++){ g.fillStyle=fogc(pick(greens),fog); g.beginPath(); g.arc(cx+R(-w*0.34,w*0.34),h*R(0.08,0.34),w*R(0.12,0.2),0,2*Math.PI); g.fill(); }
+  }
+  return o.c;
+}
+function groundSprite(k, w, h, kind, fog){
+  var o=mkc(w,h,k), g=o.g;
+  if(kind===0){ for(var i=0;i<9;i++){ g.strokeStyle=fogc(pick(["#4c8c3f","#3d7a35","#6aa84f"]),fog); g.lineWidth=Math.max(1.5,w*0.05); g.beginPath(); var x=w*R(0.2,0.8); g.moveTo(x,h); g.quadraticCurveTo(x+R(-w*0.2,w*0.2),h*0.5,x+R(-w*0.35,w*0.35),h*R(0.05,0.3)); g.stroke(); } }   /* grass tuft */
+  else if(kind===1){ g.fillStyle=fogc("#8a8a80",fog); g.beginPath(); g.ellipse(w/2,h*0.7,w*0.45,h*0.3,0,0,2*Math.PI); g.fill(); g.fillStyle=fogc("#a3a39a",fog); g.beginPath(); g.ellipse(w*0.42,h*0.6,w*0.22,h*0.14,0,0,2*Math.PI); g.fill(); }   /* stone */
+  else { g.fillStyle=fogc(pick(["#3d7a35","#4c8c3f","#2f6328"]),fog); for(var j=0;j<5;j++){ g.beginPath(); g.ellipse(w*R(0.25,0.75),h*R(0.45,0.8),w*R(0.18,0.3),h*R(0.2,0.32),0,0,2*Math.PI); g.fill(); } }   /* fern / bush */
+  return o.c;
+}
+/* move an object standing on the ground toward the viewer.
+   World units are metres: X = sideways offset, ht = object height; f = pixels per radian. */
+function walkToward(box, el, X, z0, z1, v, f, hz, eye, refH, ht, phase){
+  var N=30, fr=[], T=(z0-z1)/v;
+  for(var i=0;i<=N;i++){
+    var t=i/N, z=z0+(z1-z0)*t, sx=box._cx+X*f/z, sy=hz+eye*f/z, sc=ht*f/(z*refH), op=t<0.25?t/0.25:1;
+    fr.push({offset:t, transform:"translate("+sx.toFixed(1)+"px,"+sy.toFixed(1)+"px) scale("+sc.toFixed(4)+")", opacity:op.toFixed(3), zIndex:String(Math.round(1000/z))});
+  }
+  A(el,fr,{duration:T*1000, delay:-phase*T*1000, easing:"linear"});
+}
 function sceneForest(box, lv, tier, W, H, ppd){
-  var k=Math.min(1.1,sceneK(tier)), light=tier==="light";
+  var k=Math.min(1,sceneK(tier)), light=tier==="light";
   SC.mute={1:.3,2:.18,3:.06,4:0,5:0}[lv];
-  var groundY=H*0.72, near={1:1.5,2:3,3:4.5,4:6,5:8}[lv]*ppd;         /* nearest layer, degrees per second */
   var mist={1:0.62,2:0.42,3:0.25,4:0.18,5:0.12}[lv];
-  var base=mkc(W,H,Math.min(k,0.8)), g=base.g, sky=g.createLinearGradient(0,0,0,groundY);
-  sky.addColorStop(0,fogc("#9cc9e8",mist*0.6)); sky.addColorStop(1,fogc("#e3efe6",mist*0.6)); g.fillStyle=sky; g.fillRect(0,0,W,groundY);
-  var gd=g.createLinearGradient(0,groundY,0,H); gd.addColorStop(0,fogc("#6d8f4e",mist)); gd.addColorStop(1,fogc("#4a6a33",mist*0.6)); g.fillStyle=gd; g.fillRect(0,groundY,W,H-groundY);
-  g.fillStyle=fogc("#b79b70",mist*0.7); poly(g,[[W*0.3,H],[W*0.7,H],[W*0.53,groundY+2],[W*0.47,groundY+2]]); g.fill();   /* the path ahead */
+  var hz=H*0.44, f=ppd*57.2958, eye=1.6;                               /* eye level, pixels per radian, eye height (m) */
+  /* walking pace in metres per second: stroll, easy walk, steady walk, brisk walk, jog */
+  var v={1:0.6,2:1.0,3:1.4,4:2.0,5:3.0}[lv];
+  box._cx=W/2;
+  var base=mkc(W,H,Math.min(k,0.8)), g=base.g, sky=g.createLinearGradient(0,0,0,hz);
+  sky.addColorStop(0,fogc("#9cc9e8",mist*0.6)); sky.addColorStop(1,fogc("#e3efe6",mist*0.7)); g.fillStyle=sky; g.fillRect(0,0,W,hz);
+  for(var i=0;i<70;i++){ var tx=R(0,W), ts=H*R(0.05,0.12); poly(g,[[tx,hz-ts*1.9],[tx+ts*0.45,hz+2],[tx-ts*0.45,hz+2]],fogc(pick(["#2f5d3f","#3b6b4a"]),Math.min(0.92,0.62+mist*0.5))); }   /* far treeline in the mist */
+  var gd=g.createLinearGradient(0,hz,0,H); gd.addColorStop(0,fogc("#7a9a5c",Math.min(0.9,mist+0.25))); gd.addColorStop(1,fogc("#4a6a33",mist*0.5)); g.fillStyle=gd; g.fillRect(0,hz,W,H-hz);
+  var pw=1.6, pL=function(z){ return [W/2-pw*f/z, hz+eye*f/z]; }, pR=function(z){ return [W/2+pw*f/z, hz+eye*f/z]; };   /* a 3.2 m path to the vanishing point */
+  var pg=g.createLinearGradient(0,hz,0,H); pg.addColorStop(0,fogc("#c9b48c",Math.min(0.9,mist+0.3))); pg.addColorStop(1,fogc("#a88b5e",mist*0.5)); g.fillStyle=pg;
+  poly(g,[pL(80),pR(80),pR(0.8),pL(0.8)]); g.fill();
+  var mg=g.createLinearGradient(0,hz-H*0.08,0,hz+H*0.06); mg.addColorStop(0,"rgba(230,240,234,0)"); mg.addColorStop(0.5,"rgba(230,240,234,"+(0.35+mist*0.4).toFixed(2)+")"); mg.addColorStop(1,"rgba(230,240,234,0)"); g.fillStyle=mg; g.fillRect(0,hz-H*0.08,W,H*0.14);   /* mist on the horizon */
   put(box,base.c,0,0);
-  var layers=lv===1?[0,2]:lv===2?[0,1,2]:[0,1,2,3], f=[0.12,0.3,0.55,1], fogL=[0.7,0.5,0.3,0.08];
-  layers.forEach(function(d){
-    var period=Math.round(W*(d===3?1.2:0.9)), lh=H;
-    hScroll(box,W,H,Math.min(k,d<2?0.7:1),period,0,lh,function(g2,w2,h2){ forestLayer(g2,w2,h2,period,d,Math.min(0.9,fogL[d]+mist*(1-d*0.22)),groundY); },near*f[d],false);
-  });
-  if(lv>=3){                                                          /* leaves drifting down and past */
+  var refH=Math.round(H*0.9), z0=60;
+  /* trees on both sides of the path, spaced through the depth so the forest always looks full */
+  var nT=Math.round({1:12,2:16,3:20,4:24,5:28}[lv]*(light?0.65:1));
+  for(i=0;i<nT;i++){
+    var side=i%2?1:-1, X=side*R(2.6,lv>=4?8:10.5), ht=R(8,14), conifer=Math.random()<0.45, tw=Math.round(refH*R(0.5,0.62));
+    var el=put(box,treeSprite(k,tw,refH,conifer,mist*0.6),-tw/2,-refH); el.style.transformOrigin="50% 100%"; el.style.opacity="0";
+    var z1=Math.max(0.9,0.62*Math.abs(X)*f/(W/2));
+    walkToward(box,el,X,z0,z1,v,f,hz,eye,refH,ht,(i+R(0,0.6))/nT);
+  }
+  /* grass, stones and ferns along the path edges: the strongest ground-flow cue */
+  var nG=Math.round({1:8,2:12,3:16,4:20,5:24}[lv]*(light?0.6:1));
+  for(i=0;i<nG;i++){
+    var kind=i%3, gs=Math.round(H*0.12), side2=i%2?1:-1, X2=side2*R(1.4,3.2), ht2=kind===2?0.7:kind===1?0.3:0.45;
+    var ge=put(box,groundSprite(k,gs,gs,kind,mist*0.5),-gs/2,-gs); ge.style.transformOrigin="50% 100%"; ge.style.opacity="0";
+    walkToward(box,ge,X2,22,Math.max(0.9,0.6*Math.abs(X2)*f/(W/2)),v,f,hz,eye,gs,ht2,R(0,1));
+  }
+  if(lv>=3){                                                          /* leaves drifting down; at level 5 the wind gusts them across */
     var nL={3:8,4:14,5:24}[lv]*(light?0.5:1);
-    for(var i=0;i<nL;i++){
-      var s=Math.round(R(10,22)*Math.max(0.7,ppd/40)), wrap=document.createElement("div"); wrap.style.width=wrap.style.height=s+"px"; put(box,wrap,0,0);
+    for(i=0;i<nL;i++){
+      var s=Math.round(R(10,22)*Math.max(0.7,ppd/40)), wrap=document.createElement("div"); wrap.style.width=wrap.style.height=s+"px"; put(box,wrap,0,0); wrap.style.zIndex="1100";
       var lf=leafSprite(k,s); put(wrap,lf,0,0);
-      var gust=lv===5, vx=(gust?R(10,16):lv===4?R(4,8):R(1.5,4))*ppd, fall=(gust?R(1,3):R(1.5,3))*ppd, x0=W+s*2, y0=R(-H*0.2,H*0.7), dist=W+s*4, dur=dist/vx;
-      A(wrap,[{transform:"translate("+x0+"px,"+y0.toFixed(0)+"px)"},{transform:"translate("+(-s*2)+"px,"+(y0+fall*dur).toFixed(0)+"px)"}],{duration:dur*1000+R(0,4000), delay:-R(0,dur*1000), easing:"linear"});
+      var gust=lv===5, dir=gust?-1:(Math.random()<0.5?1:-1), vx=(gust?R(9,15):lv===4?R(1.5,3.5):R(0.5,1.8))*ppd, fall=(gust?R(1,3):R(1.5,3))*ppd;
+      var x0=gust?W+s*2:R(0,W), y0=gust?R(-H*0.2,H*0.7):-s*2, dur=gust?(W+s*4)/vx:(H+s*4)/fall, x1=x0+dir*vx*dur;
+      A(wrap,[{transform:"translate("+x0.toFixed(0)+"px,"+y0.toFixed(0)+"px)"},{transform:"translate("+x1.toFixed(0)+"px,"+(y0+fall*dur).toFixed(0)+"px)"}],{duration:dur*1000+R(0,3000), delay:-R(0,dur*1000), easing:"linear"});
       A(lf,[{transform:"rotate(0deg)"},{transform:"rotate("+(Math.random()<0.5?360:-360)+"deg)"}],{duration:R(gust?700:1500,gust?1600:3500), easing:"linear"});
     }
   }
   if(lv>=4){                                                          /* overhanging branches swaying in the wind */
     var bw=Math.round(W*0.42), bh=Math.round(H*0.42), amp=lv===5?7:3, half=lv===5?1.3:2.2;
     [true,false].forEach(function(left,j){
-      var el=put(box,branchSprite(k,bw,bh,left),left?-bw*0.05:W-bw*0.95,-bh*0.08);
-      el.style.transformOrigin=(left?"0% 5%":"100% 5%");
-      rock(el,"rotate("+(left?-amp:amp)*0.6+"deg)","rotate("+(left?amp:-amp)+"deg)",half*(j?1.17:1),j*0.4);
+      var el2=put(box,branchSprite(k,bw,bh,left),left?-bw*0.05:W-bw*0.95,-bh*0.08); el2.style.zIndex="1200";
+      el2.style.transformOrigin=(left?"0% 5%":"100% 5%");
+      rock(el2,"rotate("+(left?-amp:amp)*0.6+"deg)","rotate("+(left?amp:-amp)+"deg)",half*(j?1.17:1),j*0.4);
     });
   }
 }
@@ -4283,8 +4663,9 @@ function sceneNeural(box, lv, tier, W, H, ppd){
   var core=g.createRadialGradient(cx,cy,0,cx,cy,D*0.12); core.addColorStop(0,"rgba(120,220,255,"+(0.18+lv*0.05)+")"); core.addColorStop(1,"rgba(120,220,255,0)"); g.fillStyle=core; g.fillRect(0,0,W,H);
   put(box,base.c,0,0);
   var v10={1:1.5,2:3,3:5,4:8,5:10}[lv], z0=4, z1=0.36, Tc=10*(z0-z1)/v10;
-  var holder=box;
-  if(lv===5){ holder=document.createElement("div"); holder.style.width=W+"px"; holder.style.height=H+"px"; put(box,holder,0,0);
+  var world=absDiv(box,W,H,0,0), holder=world, flow=[];
+  box._sc={W:W,H:H,k:k,world:world,flow:flow};
+  if(lv===5){ holder=absDiv(world,W,H,0,0);
     A(holder,[{transform:"rotate(0deg)"},{transform:"rotate(360deg)"}],{duration:360/8*1000, easing:"linear"}); }   /* slow roll, 8° per second */
   /* axon fibers: still lines that converge on the far end of the nerve */
   var nF={1:28,2:40,3:52,4:60,5:66}[lv]*(light?0.7:1), angles=[];
@@ -4324,7 +4705,7 @@ function sceneNeural(box, lv, tier, W, H, ppd){
       sg.globalAlpha=1; sg.strokeStyle=col2; sg.lineWidth=R(1.4,2.2); sg.lineCap="round"; sg.beginPath(); sg.moveTo(x,y); sg.lineTo(c0+r2*(1+streak)*Math.cos(a2), c0+r2*(1+streak)*Math.sin(a2)); sg.stroke();
     }
     var el=put(holder,o.c,cx-Sd/2,cy-Sd/2); el.style.opacity="0";
-    A(el,frames(1),{duration:Tc*1000, delay:-Tc*1000*s/sheets, easing:"linear"});
+    flow.push(A(el,frames(1),{duration:Tc*1000, delay:-Tc*1000*s/sheets, easing:"linear"}));
   }
   if(lv>=3){                                                          /* myelin sheath segments sweeping past, with gaps (nodes of Ranvier) */
     var Rd=Math.round(D*0.5), rings=light?3:5;
@@ -4334,7 +4715,7 @@ function sceneNeural(box, lv, tier, W, H, ppd){
       rg.fillStyle=band; rg.beginPath(); rg.arc(rc,rc,Rd*0.49,0,2*Math.PI); rg.arc(rc,rc,Rd*0.4,0,2*Math.PI,true); rg.fill();
       rg.strokeStyle="rgba(61,245,166,.55)"; rg.lineWidth=2; rg.setLineDash([Rd*0.18,Rd*0.05]); rg.beginPath(); rg.arc(rc,rc,Rd*0.455,R(0,6.28),R(0,6.28)+2*Math.PI); rg.stroke();
       var re=put(holder,ro.c,cx-Rd/2,cy-Rd/2); re.style.opacity="0";
-      A(re,frames(0.75),{duration:Tc*1000, delay:-Tc*1000*m/rings, easing:"linear"});
+      flow.push(A(re,frames(0.75),{duration:Tc*1000, delay:-Tc*1000*m/rings, easing:"linear"}));
     }
   }
   if(lv>=4){                                                          /* signals reaching synapses and dispersing outward */
@@ -4362,7 +4743,7 @@ function sceneApply(){
   var key=["scene",sc.t,sc.lv,tier,W,H,ppd.toFixed(2)].join("|");
   box.classList.add("lite"); box.classList.remove("x6");
   if(box.getAttribute("data-k")!==key){
-    liteClear(); box.innerHTML=""; box.setAttribute("data-k",key); LITE.paused=false;
+    liteClear(); box.innerHTML=""; box.setAttribute("data-k",key); LITE.paused=false; box._sc=null;
     if(W>0 && H>0){ try{ SCENE_BUILD[sc.t](box,sc.lv,tier,W,H,Math.max(4,ppd)); } catch(e){ console.error("Background theme failed",e); } SC.mute=0; }
   }
   syncBgSel();
