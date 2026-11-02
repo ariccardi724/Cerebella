@@ -851,6 +851,7 @@ html[data-contrast="high"] .start .wordmark{background:none;-webkit-text-fill-co
 .pt-pop{position:absolute;background:var(--pc);box-shadow:0 0 18px var(--pc);transition:opacity .25s;border-radius:50%}
 .pt-pop.pt-square{border-radius:4px}.pt-pop.pt-diamond{border-radius:4px;transform:rotate(45deg)}.pt-pop.pt-star{border-radius:0;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .pt-pop.gone{opacity:0!important}
+.pt-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(54px,7vw,84px);height:clamp(54px,7vw,84px);border-radius:14px;background:#fff;color:#0b1020;display:grid;place-items:center;font:900 clamp(34px,4.6vw,56px)/1 Arial,Helvetica,sans-serif;box-shadow:0 0 0 4px var(--tcolor,#38c8ff),0 6px 18px rgba(0,0,0,.3)}
 .pt-item{position:absolute;display:grid;place-items:center;font-weight:900;font-family:Arial,Helvetica,sans-serif;line-height:1;-webkit-text-stroke:2px rgba(10,16,40,.75);paint-order:stroke;filter:drop-shadow(0 0 6px rgba(10,16,40,.55));transition:opacity .25s}
 .pt-item.gone{opacity:0}
 .pt-dot{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--dc);box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(0,0,0,.45);transition:background .3s}
@@ -863,6 +864,16 @@ html[data-contrast="high"] .start .wordmark{background:none;-webkit-text-fill-co
 .demo.pt-hide .target{opacity:0!important}
 .pt-result{margin:14px auto;text-align:center}.pt-result h3{margin:6px 0}
 .pt-prog{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+
+/* v26: start page accents */
+.start .wordmark{position:relative;display:inline-block}
+.start .vr3d{display:inline-block;margin-left:.12em;font-size:.36em;vertical-align:super;letter-spacing:.02em;font-weight:900;font-style:italic;
+  background:linear-gradient(180deg,#ffffff,#b7f7ff 45%,#38c8ff);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  transform:perspective(300px) rotateY(-24deg) rotateX(8deg) skewX(-6deg);transform-origin:left center;
+  filter:drop-shadow(1px 1px 0 #2a7fd4) drop-shadow(2px 2px 0 #2366b8) drop-shadow(3px 3px 0 #1e4f9a) drop-shadow(4px 4px 0 #5b3fb0) drop-shadow(0 0 14px rgba(56,200,255,.7))}
+html[data-contrast="high"] .start .vr3d{filter:none;-webkit-text-fill-color:#ffe14a}
+.byline-corner{position:fixed;right:clamp(12px,2.5vw,28px);bottom:clamp(10px,2vh,22px);margin:0;font-weight:800;font-size:clamp(.85rem,1.3vw,1rem);color:var(--muted);z-index:5}
+.btn.quickstart{min-width:170px}
 
 /* balance board test */
 .bchans{margin:10px 0 0;padding-left:18px;font-size:.92rem;color:var(--muted)}
@@ -1052,7 +1063,7 @@ html[data-contrast="high"] .start .wordmark{background:none;-webkit-text-fill-co
 var FOCUS = [
   {id:"Concussive", text:"A balanced mix of visual, vestibular (inner-ear and balance), and habituation (repeated movement) work.", pick:["Ocular","VOR","Balance"]},
   {id:"Ocular",     text:"More saccades (quick eye shifts), smooth pursuit (following a moving target), tracing, and visual-motion balance. Eyes stay open.", pick:["Ocular"]},
-  {id:"Vestibular", text:"More vestibulo-ocular reflex practice (keeping vision clear during head movement), cancellation (moving the head and target together), and dynamic balance.", pick:["VOR","Balance"]},
+  {id:"Vestibular", text:"More vestibulo-ocular reflex practice (keeping vision clear during head movement), cancellation (moving the head and target together).", pick:["VOR"]},
   {id:"Balance",    text:"Static and dynamic balance, sensory changes, and functional movement.", pick:["Balance"]},
   {id:"Peripheral", text:"Peripheral awareness and tracking: notice things at the edges of your vision while looking ahead, and follow several moving dots at once.", pick:["Periph"]}
 ];
@@ -1221,7 +1232,7 @@ function typeSwitches(list, scope){
   }).join("")+'</div>';
 }
 function applySelection(list, focusId, mode){
-  var f = FOCUS.filter(function(x){return x.id===focusId;})[0];
+  var ids=String(focusId||"").split(" + "), f={pick:[]}; FOCUS.forEach(function(x){ if(ids.indexOf(x.id)>=0) f.pick=f.pick.concat(x.pick); });   /* one focus or several combined */
   list.forEach(function(e){
     if(mode==="all") e.on=true;
     else if(mode==="none") e.on=false;
@@ -1788,10 +1799,10 @@ var SCREENS = {
       '<button class="btn primary" data-act="save-profile">'+(rp?"Save name":"Create profile")+'</button>'+(has||S.convertGuest?'<button class="btn" data-act="cancel-profile">Cancel</button>':'')+
       '<p class="err" id="npErr" role="alert"></p></div>';
     return '<section class="screen start"><div class="center wide">'+
-      '<h1 class="wordmark">Cerebella</h1>'+
+      '<h1 class="wordmark">Cerebella<span class="vr3d" aria-label=" VR">VR</span></h1>'+
       '<img class="hero-logo" alt="Cerebella app icon" src="'+$(".brand img.logo").src+'">'+
-      '<p class="byline">Developed by Dr. Riccardi</p>'+
-      '<p class="exclusive">A Bala North Exclusive</p>'+
+      '<p class="exclusive">A Bala North Exclusive Experience</p>'+
+      '<p class="byline-corner">Developed by Dr. Alexander Riccardi</p>'+
       '<p class="tagline">A personalized, interactive, immersive experience to work towards improving your balance, gaze, and equilibrium</p>'+
       '<h2 class="start-h">'+(S.convertGuest?"Keep this visit":has?"Who’s practicing?":"Create your profile")+'</h2><p class="lead">'+
       (has?"Choose your profile to begin. Your sessions are saved under it, so you can see your progress over time.":"Create a profile with your first name and last initial. Your sessions are saved under it so you can see your progress over time.")+'</p>'+
@@ -1823,7 +1834,7 @@ var SCREENS = {
       '<div class="hello"><div><h1>'+greeting()+(P.guest?'':', '+esc(pfirst(P)))+'</h1><p class="lead">Move at your pace. Each challenge is brief, guided, and followed by a chance to check in.</p></div>'+
       '<div class="ring" style="--p:'+Math.min(n,7)/7*100+'%" role="img" aria-label="'+n+' day practice streak"><div><strong>'+n+'</strong>day streak</div></div></div>'+
       '<div class="grid2"><article class="today"><h2>Start a session</h2><p class="muted">Gaze, eye movement, and balance work in a gradual sequence.</p>'+parts+
-      '<div class="row" style="margin-top:6px"><button class="btn primary" data-act="new">Build a session</button><button class="btn" data-act="periph-mode">Peripheral & tracking training</button>'+(last?'<button class="btn" data-act="repeat">Repeat '+esc(last.focus)+', Level '+last.level+'</button>':'')+'</div>'+routines+'</article>'+
+      '<div class="row" style="margin-top:6px"><button class="btn primary quickstart" data-act="quick">Quick start</button><button class="btn" data-act="new">Build a session</button>'+(last?'<button class="btn" data-act="repeat">Repeat '+esc(last.focus)+', Level '+last.level+'</button>':'')+'</div>'+routines+'</article>'+
       '<div class="side">'+(!P.prefs.ask?'':'<article class="card"><h3>How are you feeling?</h3><p class="muted">Choose what feels closest right now.</p><div class="feel">'+
       FEELINGS.map(function(f){ return '<button data-act="feel" data-v="'+esc(f.t)+'" aria-pressed="'+(S.feeling===f.t)+'">'+esc(f.t)+'</button>'; }).join("")+
       '</div><p class="feelmsg" aria-live="polite">'+(S.feeling?esc(FEELINGS.filter(function(f){return f.t===S.feeling;})[0].m):"")+'</p></article>')+
@@ -1864,8 +1875,8 @@ var SCREENS = {
 
   focus:function(){
     return '<section class="screen"><div class="intro"><div><h1>What are we working on today?</h1>'+
-      '<p class="lead">Choose the focus your physical therapist prescribed. Your session blends gaze, visual motion, and balance challenges in a gradual sequence.</p>'+
-      '<div class="options" role="group" aria-label="Session focus">'+FOCUS.map(function(f){ return '<button class="opt" data-act="pick-focus" data-v="'+f.id+'" aria-pressed="'+(S.focus===f.id)+'"><b>'+f.id+'</b><span>'+f.text+'</span></button>'; }).join("")+'</div>'+
+      '<p class="lead">Choose one or more focus areas your physical therapist prescribed. Your session blends gaze, visual motion, and balance challenges in a gradual sequence.</p>'+
+      '<div class="options" role="group" aria-label="Session focus">'+FOCUS.map(function(f){ return '<button class="opt" data-act="pick-focus" data-v="'+f.id+'" aria-pressed="'+((S.focus||"").split(" + ").indexOf(f.id)>=0)+'"><b>'+f.id+'</b><span>'+f.text+'</span></button>'; }).join("")+'</div>'+
       '<button class="btn primary" data-act="next" '+(S.focus?"":"disabled")+'>Continue to setup</button></div>'+emblem+'</div></section>';
   },
 
@@ -2399,6 +2410,9 @@ document.addEventListener("click",function(ev){
     case "dva-cancel": dvaClear(); S.dva=null; go("home"); toast("Vision check stopped"); break;
     case "bg-pick": if(v==="6" && !isScene(S.bgTheme)) ensureX6(function(){ S.bgPick="6"; rerender(); }); else { S.bgPick=v; rerender(); } break;
     case "room-pick": if(P){ P.prefs.room=v; saveDB(); } rerender(); announce("Room: "+v); break;
+    case "quick": var lq=hist()[hist().length-1]; S.pending=null; S.focus=(lq&&lq.focus)||"Concussive"; S.level=(lq&&lq.level)||3; S.consent=false; S.editRoutine=null; S.mode="Quick start";
+      S.restBetween=BREAK_BETWEEN_EXERCISES; S.bgPick="auto"; S.bgTheme=themeOf(lq&&lq.theme); S.deg=null; S.list=buildExercises(S.level); applySelection(S.list,S.focus,"focus");
+      if(!S.list.some(function(e){ return e.on; })) applySelection(S.list,"Concussive","focus"); startSession(); break;    /* begins immediately with the last focus and level */
     case "periph-mode": S.focus="Peripheral"; S.mode="Peripheral & tracking"; S.restBetween=BREAK_BETWEEN_EXERCISES; S.bgPick="auto"; S.deg=null; go("level"); break;
     case "pt-score": ptScore(v==="1"); break;
     case "pt-found": ptFound(+v); break;
@@ -3153,6 +3167,7 @@ function vrTargets(dt){
   }
   if(c.demo==="okn"){ out.push({kind:"dot", az:0, el:0, deg:0.8, tex:texDot("fix","#ffffff",false)}); return out; }
   var VH=80, VV=60;                                                         /* v22: in VR the target ranges across the whole field of view */
+  if(c.cat==="Ocular" && !/cancel/i.test(c.title||"")){ VH=25; VV=15; }     /* v26: eye tracking and saccades stay within view without turning the head */
   if(c.pt && /^mot|trace|gate/.test(c.pt)) show=false;                        /* dot tracking and tracing have their own targets */
   if(show) out.push({kind:"target", az:fx*VH, el:-fy*VV, lettered:lettered, glyph:s.glyph||""});
   var fd=$("#fixdot"), cu=$("#cue2");
@@ -5078,6 +5093,11 @@ function sceneForest(box, lv, tier, W, H, ppd){
     gb.style.zIndex="1150"; A(gb,[{transform:"translate("+(dr>0?-gs2:W)+"px,"+y3.toFixed(0)+"px) scaleY(1)"},{offset:0.5,transform:"translate("+(W/2)+"px,"+(y3-H*0.04).toFixed(0)+"px) scaleY(.6)"},{transform:"translate("+(dr>0?W:-gs2)+"px,"+y3.toFixed(0)+"px) scaleY(1)"}],{duration:dur3, delay:-R(0,dur3), easing:"linear"}); }
   if(lv>=4){ var nRun=lv===5?4:2; for(var rn=0;rn<nRun;rn++){ var isBike=lv===5&&rn%2===0, rh2=Math.round(H*0.5), rw2=Math.round(rh2*(isBike?0.9:0.4)), spr=isBike?bikerSprite(k,rw2,rh2):personFront(k,rw2,rh2);   /* runners and cyclists overtaking you */
     var re=put(bob,spr,-rw2/2,-rh2); re.style.transformOrigin="50% 100%"; re.style.opacity="0"; walkToward(box,re,(rn%2?1:-1)*R(0.9,1.3),40,7,isBike?R(3,5):R(1.5,2.5),f,hz,eye,rh2,isBike?1.7:1.75,R(0,1)); try{ re.getAnimations()[0].reverse(); }catch(e){} } }
+  if(SC.l6){ for(var bk=0;bk<6;bk++){ var bh3=Math.round(H*0.4), bw3=Math.round(bh3*0.9), kind=bk%3;                  /* level 6: cyclists coming head-on, passing from behind, and crossing ahead */
+      if(kind<2){ var be=put(bob,bikerSprite(k,bw3,bh3),-bw3/2,-bh3); be.style.transformOrigin="50% 100%"; be.style.opacity="0";
+        walkToward(box,be,(kind===0?-1:1)*R(1.4,2.0),45,kind===0?6:9,kind===0?v+R(4,6):R(2,4),f,hz,eye,bh3,1.7,R(0,1)); if(kind===1) try{ be.getAnimations()[0].reverse(); }catch(e){} }
+      else { var zc=R(9,15), sc4=1.7*f/(zc*bh3), yc=hz+eye*f/zc-bh3*sc4, dirc=bk%2?1:-1, Tc4=R(3500,5500)+R(2000,6000), bc=put(bob,bikerSprite(k,bw3,bh3),0,0); bc.style.transformOrigin="0 0"; bc.style.zIndex=String(Math.round(1000/zc));
+        A(bc,[{transform:"translate("+(dirc>0?-bw3*sc4:W)+"px,"+yc.toFixed(0)+"px) scale("+(dirc*sc4).toFixed(3)+","+sc4.toFixed(3)+")"},{offset:0.6,transform:"translate("+(dirc>0?W:-bw3*sc4)+"px,"+yc.toFixed(0)+"px) scale("+(dirc*sc4).toFixed(3)+","+sc4.toFixed(3)+")"},{transform:"translate("+(dirc>0?W:-bw3*sc4)+"px,"+yc.toFixed(0)+"px) scale("+(dirc*sc4).toFixed(3)+","+sc4.toFixed(3)+")"}],{duration:Tc4, delay:-R(0,Tc4), easing:"linear"}); } } }
   if(lv===5){ var hb=Math.round(H*0.22), he=put(box,handlebarCanvas(W,hb,k),0,H-hb*0.75); he.style.zIndex="1300";        /* riding a bike */
     A(he,[{transform:"translateX(-4px) rotate(-0.6deg)"},{transform:"translateX(4px) rotate(0.6deg)"}],{duration:1400, easing:"ease-in-out", direction:"alternate"}); }
 }
@@ -5220,6 +5240,11 @@ function forestVrItems(lv, dt, running){
     items.push({buf:"quad", M:mmul(mmul(base,mT(t.x,t.h/2,t.z)),mmul(yawTo(t.x,t.z),mS(t.h*0.56,t.h,1))), tex:texTree(t.v,t.con,season), uvS:[1,1], uvO:[0,0], tint:[1-fogA*0.4,1-fogA*0.3,1-fogA*0.35,fade], depth:true}); });
   F2.tufts.forEach(function(u){ u.z+=step; if(u.z>4) u.z-=44;
     items.push({buf:"quad", M:mmul(mmul(base,mT(u.x,0.25,u.z)),mmul(yawTo(u.x,u.z),mS(0.6,0.5,1))), tex:texSprite("tuft"+season,128,128,function(kk){ return groundSprite(kk,128,128,0,0); }), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:true}); });
+  var sl6=sessionScene(); if(sl6 && sl6.l6){ F2.bikes=F2.bikes||[{m:0,z:-50,x:-1},{m:0,z:-25,x:-1.1},{m:1,z:3,x:1},{m:1,z:-10,x:0.9},{m:2,z:-12,x:-14},{m:2,z:-18,x:10}];   /* level 6 cyclists */
+    F2.bikes.forEach(function(b2){ var d2=running?dt/1000:0;
+      if(b2.m===0){ b2.z+=step+5*d2; if(b2.z>5) b2.z=-R(50,70); } else if(b2.m===1){ b2.z+=step-(v+3)*d2; if(b2.z<-60) b2.z=4; } else { b2.z+=step; b2.x+=(b2.x<0?1:-1)*0+5*d2*(b2.dir||(b2.dir=b2.x<0?1:-1)); if(Math.abs(b2.x)>16||b2.z>4){ b2.z=-R(10,20); b2.dir=Math.random()<0.5?1:-1; b2.x=-15*b2.dir; } }
+      var face=b2.m===2?(b2.dir>0?0:Math.PI):yawTo(b2.x,b2.z);
+      items.push({buf:"quad", M:mmul(mmul(base,mT(b2.x,0.95,b2.z)),b2.m===2?mmul(mRY(face),mS(1.8,1.9,1)):mmul(face,mS(1.1,1.9,1))), tex:texSprite("fbike"+b2.m,256,280,function(kk){ return bikerSprite(kk,256,280); }), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:true}); }); }
   var an=evtActive("animal"); if(an){ if(!an.vr) an.vr={deer:Math.random()<0.6, z:-R(10,18)}; var p=evtProg(an), ax=an.dir*(-12+24*p), deer=an.vr.deer;
     items.push({buf:"quad", M:mmul(mmul(base,mT(ax,deer?0.75:0.15,an.vr.z)),mmul(mRY(an.dir>0?0:Math.PI),mS(deer?1.8:0.4,deer?1.5:0.3,1))), tex:texSprite(deer?"deer":"squirrel",256,212,function(kk){ return deer?deerSprite(kk,256,212):squirrelSprite(kk,256,212); }), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:true}); }
   if(lv>=3){ var lc=season==="winter"?[[1,1,1]]:pal.leaf.map(hexRGB); items.push(particleItem("leaves"+season+lv, lv===5?700:lv===4?450:250, lv===5?2.4:1.2, lc, season==="winter"?0.05:0.07, 0, 0)); }
@@ -5868,7 +5893,8 @@ function ptStart(type){
   PT.st={type:type, lv:lv, ecc:6+lv*3.5, dur:Math.max(250,1400-lv*190), size:Math.max(1.1,3.4-lv*0.4), contrast:Math.max(0.45,1-lv*0.08),
     nT:Math.min(5,1+Math.ceil(lv/2)), nD:4+lv*2, spd:2+lv*1.6, next:performance.now()+1500};
   PT.trial=null; ptClear();
-  var d=$("#demo"); if(d) d.classList.toggle("pt-hide",/^mot/.test(type));
+  var d=$("#demo"); if(d) d.classList.toggle("pt-hide",true);
+  if(!/^mot|trace/.test(type)){ var cl=document.createElement("div"); cl.className="pt-center"; ptLayer().appendChild(cl); PT.st.centerEl=cl; PT.st.centerT=0; }
   ptPanel(/^mot/.test(type)?"mot":type==="where"?"where":type==="trace"?"trace":type==="gate"?null:"pop");
   if(type==="gate"){ var gl=document.createElement("div"); gl.className="pt-label"; ptLayer().appendChild(gl); PT.st.ruleEl=gl; PT.st.ruleName=null; gl.textContent="Squeeze the trigger (or tap) only for: "+gateRule().name; PT.headN=0; PT.headOk=0; }
   if(type==="trace") ptTraceStart();
@@ -5952,6 +5978,7 @@ function ptTick(){
   if(key!==PT.key){ PT.key=key; if(type) ptStart(type); else if(PT.st) ptStop(); }
   if(!type || !PT.st) return;
   var running=s.phase==="run" && !s.paused, now=performance.now(), dt=Math.min(0.1,(now-(PT.last||now))/1000); PT.last=now;
+  if(PT.st.centerEl && now-PT.st.centerT>10000){ PT.st.centerT=now; var gl2="ABCDEFHKLNOPRSTUVZ"; var ng=gl2[Math.floor(Math.random()*gl2.length)]; if(ng===PT.st.glyph) ng=gl2[(gl2.indexOf(ng)+5)%gl2.length]; PT.st.glyph=ng; PT.st.centerEl.textContent=ng; }   /* the center letter changes every 10 seconds */
   if(!running){ if(PT.st) PT.st.next=Math.max(PT.st.next,now+800); return; }
   if(/^mot/.test(type)){ if(!PT.trial) ptMotStart(now); ptMotFrame(now,dt); }
   else if(type==="trace") ptTraceFrame(now);
@@ -6008,7 +6035,8 @@ function gateVrItems(running){
   out.push({buf:"quad", M:mmul(vrPlace(0,0,2.5),mS(rs,rs,1)), tex:vrCanvasTex("gatering",256,256,function(g,w,h){ g.clearRect(0,0,w,h); g.strokeStyle="#ffffff"; g.lineWidth=10; g.beginPath(); g.arc(w/2,h/2,w*0.46,0,6.28); g.stroke(); },"r"), uvS:[1,1], uvO:[0,0], tint:inside?[0.3,1,0.6,1]:[1,0.35,0.4,1], depth:false});
   out.push({buf:"quad", M:mmul(vrPlace(hy,hp,2.45),mS(0.05,0.05,1)), tex:texDot(inside?"glIn":"glOut",inside?"#3df5a6":"#ff4d6d",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});   /* the head laser's dot */
   out.push({buf:"quad", M:mmul(vrPlace(0,zone+9,2.5),mS(1.3,0.15,1)), tex:texHud([{t:"Trigger only for: "+(st.ruleName||gateRule().name), s:30}]), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
-  var t=PT.trial; if(t && t.gate && performance.now()-t.t0<st.dur){ var az=Math.max(-85,Math.min(85,t.az*2.1)), el=Math.max(-60,Math.min(60,t.el2*1.6)), sz=2*2.5*Math.tan(st.size*1.6*D2R/2);
+  if(st.glyph) out.push({buf:"quad", M:mmul(vrPlace(0,0,2.52),mS(0.3,0.3,1)), tex:texLetter(st.glyph), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  var t=PT.trial; if(t && t.gate && performance.now()-t.t0<st.dur){ var az=Math.max(-50,Math.min(50,t.az*1.3)), el=Math.max(-32,Math.min(32,t.el2*1.2)), sz=2*2.5*Math.tan(st.size*1.6*D2R/2);
     var tex=vrCanvasTex("gateitem",256,256,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle=t.col; g.strokeStyle=t.col;
       if(t.item.shape){ var im=new Image(); } g.textAlign="center"; g.textBaseline="middle";
       if(t.item.txt){ g.font="900 190px Arial"; g.fillText(t.item.txt,w/2,h/2+8); }
@@ -6055,8 +6083,9 @@ function ptVrItems(dt, running){
     return out; }
   if(st.type==="trace"){ return ptVrTrace(dt, running); }
   if(st.type==="gate"){ return gateVrItems(running); }
-  var tr=PT.trial; if(tr && performance.now()-tr.t0<st.dur && tr.az!=null){ var ppdS=1, az=tr.az*2.1, el=tr.el2*1.6;                   /* pop-ups reach far into your side vision in VR */
-    az=Math.max(-85,Math.min(85,az)); el=Math.max(-60,Math.min(60,el)); var sz2=2*2.5*Math.tan(st.size*D2R/2);
+  if(st.glyph) out.push({buf:"quad", M:mmul(vrPlace(0,0,2.5),mS(0.36,0.36,1)), tex:texLetter(st.glyph), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});   /* the center letter */
+  var tr=PT.trial; if(tr && performance.now()-tr.t0<st.dur && tr.az!=null){ var ppdS=1, az=tr.az*1.3, el=tr.el2*1.2;                   /* within comfortable side vision */
+    az=Math.max(-50,Math.min(50,az)); el=Math.max(-32,Math.min(32,el)); var sz2=2*2.5*Math.tan(st.size*D2R/2);
     out.push({buf:"quad", M:mmul(vrPlace(az,el,2.5),mS(sz2,sz2,1)), tex:texDot("ptpop","#ffe14a",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,st.contrast], depth:false}); }
   return out;
 }
@@ -6855,7 +6884,7 @@ document.addEventListener("click",function(ev){
       confirmAsk("Delete “"+dr.name+"”?","The routine will be removed. Your sessions are not affected.","Delete routine",function(){ P.routines=P.routines.filter(function(x){return x.id!==id;}); saveDB(); rerender(); }); break;
 
     /* session setup flow */
-    case "pick-focus": S.focus=v; rerender(); break;
+    case "pick-focus": var fl=(S.focus||"").split(" + ").filter(Boolean), fi=fl.indexOf(v); if(fi>=0) fl.splice(fi,1); else fl.push(v); S.focus=fl.length?fl.join(" + "):null; rerender(); break;   /* several can be chosen */
     case "pick-level": if(+v===6) ensureX6(function(){ S.level=6; rerender(); }); else { S.level=+v; rerender(); } break;
     case "next":
       if(S.screen==="focus") go("safety");
@@ -7074,7 +7103,7 @@ function fallbackCopy(t){ var x=document.createElement("textarea"); x.value=t; d
 /* ================================================================
    START
    ================================================================ */
-applyTheme(store.get("vt_theme", (window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark"));
+applyTheme(store.get("vt_theme", "dark"));   /* dark by default */
 applyPrefs();
 $$("img[data-logo]").forEach(function(im){ im.src=$(".brand img.logo").src; });
 go("profiles");
