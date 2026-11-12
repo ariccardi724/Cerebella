@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Cerebella VR. © Dr. Alexander Riccardi / Bala North, all rights reserved. Use is subject to the Terms of use shown in the app. Do not copy, modify or redistribute without written permission. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -451,7 +452,9 @@ dialog .err{text-align:left;flex-basis:auto}
 .report .tile{border:1px solid #bbb;background:#fff;padding:8pt 10pt;border-radius:6pt}
 .report .tile strong{font-size:16pt}
 @media print{
-  body.printing>*:not(#report){display:none!important}
+  body.printing>*:not(#report):not(.copyright){display:none!important}
+  body.printing .copyright{position:static;display:block!important;color:#333;opacity:1;margin:12px 0 0;max-width:none}
+  body.printing .copyright button{display:none}
   body.printing #report{display:block!important}
   body.printing{background:#fff!important;overflow:visible!important}
   .report .chartcard,.report .tbl tr{break-inside:avoid}
@@ -848,18 +851,51 @@ html[data-contrast="high"] .start .wordmark{background:none;-webkit-text-fill-co
 
 /* v24: peripheral and tracking tasks */
 #ptLayer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
-.pt-pop{position:absolute;background:var(--pc);box-shadow:0 0 18px var(--pc);transition:opacity .25s;border-radius:50%}
-.pt-pop.pt-square{border-radius:4px}.pt-pop.pt-diamond{border-radius:4px;transform:rotate(45deg)}.pt-pop.pt-star{border-radius:0;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.pt-pop{position:absolute;transition:opacity .25s;filter:drop-shadow(0 0 4px var(--pc)) drop-shadow(0 0 12px var(--pc))}
+.pt-pop svg{display:block;width:100%;height:100%;overflow:visible}
+.pt-pop.glow{animation:ptGlow .9s ease-in-out infinite alternate}
+@keyframes ptGlow{from{filter:drop-shadow(0 0 3px var(--pc)) drop-shadow(0 0 9px var(--pc))}to{filter:drop-shadow(0 0 7px var(--pc)) drop-shadow(0 0 22px var(--pc))}}
 .pt-pop.gone{opacity:0!important}
 #mzLayer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
 .mz-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto;touch-action:none}
 .mz-dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#3df5a6;box-shadow:0 0 14px 4px rgba(61,245,166,.8);pointer-events:none}
 .mz-dot.hit{background:#ff4d6d;box-shadow:0 0 14px 4px rgba(255,77,109,.85)}
+.mz-canvas.hp{cursor:none}
+.cv-stat{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;background:rgba(8,14,34,.82);color:#fff;font-weight:800;padding:6px 16px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.mz-dot.hp{width:22px;height:22px;box-shadow:0 0 0 3px #05261a,0 0 18px 6px rgba(61,245,166,.85)}
+.mz-dot.hp.hit{box-shadow:0 0 0 3px #3a0612,0 0 18px 6px rgba(255,77,109,.9)}
+.hp-prompt{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;max-width:min(560px,86%);text-align:center;background:rgba(8,14,34,.94);color:#fff;padding:22px 26px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);pointer-events:none}
+.hp-prompt b{display:block;font-size:clamp(20px,2.6vw,28px);margin-bottom:8px}
+.hp-prompt span{display:block;opacity:.85;line-height:1.45}
+.hp-edge{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);z-index:5;background:rgba(255,209,102,.95);color:#1a1200;font-weight:800;padding:6px 14px;border-radius:999px;pointer-events:none}
 .pt-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(54px,7vw,84px);height:clamp(54px,7vw,84px);border-radius:14px;background:#fff;color:#0b1020;display:grid;place-items:center;font:900 clamp(34px,4.6vw,56px)/1 Arial,Helvetica,sans-serif;box-shadow:0 0 0 4px var(--tcolor,#38c8ff),0 6px 18px rgba(0,0,0,.3)}
 .pt-item{position:absolute;display:grid;place-items:center;font-weight:900;font-family:Arial,Helvetica,sans-serif;line-height:1;-webkit-text-stroke:2px rgba(10,16,40,.75);paint-order:stroke;filter:drop-shadow(0 0 6px rgba(10,16,40,.55));transition:opacity .25s}
 .pt-item.gone{opacity:0}
-.pt-dot{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--dc);box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(0,0,0,.45);transition:background .3s}
-.pt-dot.cue{box-shadow:0 0 0 4px #fff,0 0 22px 8px var(--dc)}
+.pt-dot{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 50% 42%,#fff 0 16%,var(--dc) 52%);box-shadow:0 0 0 2px var(--pr,rgba(255,255,255,.85)),0 0 10px 3px var(--dc),0 0 22px 6px var(--dc);transition:background .3s,box-shadow .3s}
+.pt-dot.cue{animation:ptCue .55s ease-in-out infinite alternate}
+@keyframes ptCue{from{box-shadow:0 0 0 3px #fff,0 0 14px 5px var(--dc),0 0 30px 10px var(--dc)}to{box-shadow:0 0 0 5px #fff,0 0 24px 10px var(--dc),0 0 48px 18px var(--dc)}}
+.pt-dot.stop{background:#64748b;box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(0,0,0,.45);animation:none}
+.pt-dot.plain{background:var(--dc);box-shadow:0 0 0 2px var(--pr)}
+.pt-dot.plain.blink{animation:ptBlink 1.2s ease-in-out infinite}
+@keyframes ptBlink{0%,35%{background:var(--dc);box-shadow:0 0 0 2px var(--pr)}50%,85%{background:#fffbe0;box-shadow:0 0 0 3px #fff,0 0 16px 7px #ffe14a,0 0 38px 16px rgba(255,214,60,.75)}100%{background:var(--dc);box-shadow:0 0 0 2px var(--pr)}}
+.pt-dot.plain.stop{background:var(--dc);box-shadow:0 0 0 2px var(--pr)}
+.pt-guide.letter{width:44px;height:44px;display:grid;place-items:center;font:900 28px/1 Arial,Helvetica,sans-serif;color:#05261a;background:#3df5a6;box-shadow:0 0 0 3px #05261a,0 0 16px #3df5a6}
+.pt-bull{position:absolute;left:50%;top:50%;width:64px;height:64px;transform:translate(-50%,-50%);z-index:3;filter:drop-shadow(0 0 3px rgba(0,0,0,.6))}
+.pt-guide.cshape{width:46px;height:46px;border-radius:50%;background:var(--gc,#ef4444);box-shadow:0 0 0 3px #0b1020,0 0 0 6px #fff;transition:background .15s}
+.ws-page{position:absolute;left:50%;top:50%;width:min(92%,1100px);transform:translate(-50%,-50%);transform-origin:50% 50%;background:#fbf8ef;color:#111827;border-radius:14px;padding:2.2% 3%;box-shadow:0 18px 60px rgba(0,0,0,.55);z-index:3;will-change:transform}
+.ws-row{font-family:"Courier New",Courier,monospace;font-weight:800;white-space:nowrap;overflow:hidden;text-align:center;line-height:1.18;letter-spacing:.12em}
+.ws-row .w.on{background:#ffe066;border-radius:4px;box-shadow:0 0 0 2px #e0a800}
+.pt-quiz{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;text-align:center;background:rgba(10,16,40,.92);color:#fff;padding:22px 30px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.pt-quiz b{display:block;font:900 clamp(40px,7vw,84px)/1.1 system-ui,sans-serif;letter-spacing:.08em;margin-top:8px;color:#3df5a6}
+.pt-quiz span{font:800 clamp(18px,2.4vw,28px)/1.3 system-ui,sans-serif}
+.pt-meter{display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding-left:8px;border-left:1px solid rgba(255,255,255,.25)}
+.pt-bar{display:inline-flex;gap:3px;align-items:flex-end}
+.pt-bar i{display:block;width:8px;border-radius:2px;background:rgba(255,255,255,.22)}
+.pt-bar i:nth-child(1){height:8px}.pt-bar i:nth-child(2){height:11px}.pt-bar i:nth-child(3){height:14px}.pt-bar i:nth-child(4){height:17px}.pt-bar i:nth-child(5){height:20px}.pt-bar i:nth-child(6){height:23px}
+.pt-bar i.on:nth-child(-n+2){background:#3df5a6}.pt-bar i.on:nth-child(n+3){background:#ffd166}.pt-bar i.on:nth-child(n+5){background:#ff7a59}
+.pt-meter small{min-width:5.5em;font-weight:700;opacity:.85}
+.pt-label.sub{top:40px;font-size:clamp(13px,1.5vw,18px)}
+@media (prefers-reduced-motion:reduce){.pt-pop.glow,.pt-dot.cue{animation:none}.pt-dot.plain.blink{animation-duration:2.4s}}
 .pt-label{position:absolute;top:10px;left:0;right:0;text-align:center;font:800 clamp(15px,1.8vw,22px)/1.2 system-ui,sans-serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6)}
 .pt-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:900 clamp(26px,4vw,48px)/1 system-ui,sans-serif;color:#fff;background:rgba(10,16,40,.75);padding:8px 18px;border-radius:12px}
 .pt-guide{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:#3df5a6;box-shadow:0 0 18px #3df5a6}
@@ -878,6 +914,13 @@ html[data-contrast="high"] .start .wordmark{background:none;-webkit-text-fill-co
 html[data-contrast="high"] .start .vr3d{filter:none;-webkit-text-fill-color:#ffe14a}
 .byline-corner{position:fixed;right:clamp(12px,2.5vw,28px);bottom:clamp(10px,2vh,22px);margin:0;font-weight:800;font-size:clamp(.85rem,1.3vw,1rem);color:var(--muted);z-index:5}
 .btn.quickstart{min-width:170px}
+.copyright{position:fixed;left:clamp(10px,2vw,22px);bottom:clamp(6px,1.2vh,12px);z-index:70;margin:0;font-size:.74rem;font-weight:600;color:var(--muted);opacity:.85;pointer-events:none;max-width:calc(100vw - 260px)}
+.copyright button{pointer-events:auto;background:none;border:0;padding:2px 4px;margin-left:4px;font:inherit;color:inherit;text-decoration:underline;cursor:pointer;border-radius:4px}
+.copyright button:focus-visible{outline:2px solid var(--tcolor,#38c8ff)}
+body:has(#session:not([hidden])) .copyright{opacity:.55;font-size:.68rem}
+#termsDlg .terms{max-height:60vh;overflow:auto;padding-right:6px;line-height:1.5}
+#termsDlg .terms h3{margin:16px 0 4px;font-size:1rem}
+#termsDlg .terms p{margin:0 0 8px}
 
 /* balance board test */
 .bchans{margin:10px 0 0;padding-left:18px;font-size:.92rem;color:var(--muted)}
@@ -890,12 +933,8 @@ html[data-contrast="high"] .start .vr3d{filter:none;-webkit-text-fill-color:#ffe
 
 </style>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Cerebella">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#070f26">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#071026">
 </head>
 <body>
 <a class="skip" href="#app" data-act="skip">Skip to main content</a>
@@ -1056,6 +1095,28 @@ html[data-contrast="high"] .start .vr3d{filter:none;-webkit-text-fill-color:#ffe
   <div class="row"><button class="btn primary" data-act="dlg-close" data-v="prefDlg">Done</button></div>
 </dialog>
 
+<dialog id="termsDlg" class="wide" aria-labelledby="termsTitle">
+  <h2 id="termsTitle">Terms of use</h2>
+  <div class="terms">
+    <p>Cerebella VR (“the app”) is © Dr. Alexander Riccardi / Bala North, all rights reserved. By using the app you agree to these terms.</p>
+    <h3>Ownership</h3>
+    <p>The app, including its code, design, exercises, artwork, names and logos, belongs to Dr. Alexander Riccardi and Bala North and is protected by copyright and other laws.</p>
+    <h3>Permitted use</h3>
+    <p>You may use the app for your own therapy, or with your patients if you are a clinician authorized by Bala North. You may not copy, modify, translate, reverse engineer, resell, sublicense or redistribute the app or any part of it, or remove this notice, without written permission.</p>
+    <h3>Health and safety</h3>
+    <p>The app supports therapy and does not replace assessment, diagnosis or treatment by a qualified clinician. Use it only as your clinician directs. Moving scenes, flashing elements and virtual reality can cause dizziness, nausea, falls or, rarely, seizures in people with photosensitivity. Stop at once and rest if you feel unwell, and have someone guard you during balance work.</p>
+    <h3>Your information</h3>
+    <p>Profiles and session results are stored only on this device. Bala North does not receive them. You are responsible for keeping backups and for protecting access to the device.</p>
+    <h3>No warranty</h3>
+    <p>The app is provided “as is”, without warranties of any kind. To the extent the law allows, Dr. Alexander Riccardi and Bala North are not liable for injury, loss or damage arising from use of the app.</p>
+    <h3>Changes</h3>
+    <p>These terms may be updated with new versions of the app. Continuing to use the app means you accept the current terms.</p>
+  </div>
+  <div class="row"><button class="btn primary" data-act="dlg-close" data-v="termsDlg">Close</button></div>
+</dialog>
+
+<p class="copyright">© Dr. Alexander Riccardi / Bala North, all rights reserved<button type="button" data-act="terms">Terms of use</button></p>
+
 <div id="report" class="report" aria-hidden="true"></div>
 
 <script>
@@ -1147,20 +1208,27 @@ function buildExercises(level){
   }
 
   /* v24: peripheral awareness and tracking (chosen with the Peripheral focus, or the type switch) */
-  [["pop","Peripheral pop-ups","Keep your eyes on the center letter. Shapes flash briefly around the edges of your vision: say \u201cnow\u201d or tap when you notice one. Do not look at them."],
-   ["where","Peripheral: where was it?","Keep your eyes on the center letter. When a shape flashes at the edge, say which direction it was (up, lower left, and so on). Do not look at it."],
-   ["scene","Peripheral: spot it in a moving scene","Keep your eyes on the center letter while the scene moves. Say \u201cnow\u201d or tap when a shape flashes at the edge."],
-   ["mot","Dot tracking: follow the glowing dots","Watch which dots glow, then keep track of them as all the dots move. When they stop, point to the ones you followed."],
-   ["motc","Dot tracking: follow one color","Keep track of every dot of the named color as they move. When they stop and turn gray, point to them."],
-   ["mot3d","Dot tracking in 3D (best in VR)","Follow the glowing dots as they move nearer and farther as well as around you. When they stop, point to them."],
+  [["pop","Peripheral pop-ups","Keep your eyes on the center letter. Shapes flash briefly around the edges of your vision: say \u201cnow\u201d or tap when you notice one. Do not look at them. Say the center letter out loud each time it changes (every 3 seconds)."],
+   ["where","Peripheral: where was it?","Keep your eyes on the center letter. When a shape flashes at the edge, say which direction it was (up, lower left, and so on). Do not look at it. Say the center letter out loud each time it changes (every 3 seconds)."],
+   ["scene","Peripheral: spot it in a moving scene","Keep your eyes on the center letter while the scene moves. Say \u201cnow\u201d or tap when a shape flashes at the edge. Say the center letter out loud each time it changes (every 3 seconds)."],
+   ["mot","Dot tracking: follow the glowing dots","All the dots are the same color. A few of them glow on and off: keep track of those as all the dots move. When they stop, point to the ones you followed. Say the center letter out loud each time it changes (every 3 seconds)."],
+   ["motc","Dot tracking: follow one color","Keep track of every dot of the named color as they move. When they stop and turn gray, point to them. Say the center letter out loud each time it changes (every 3 seconds)."],
+   ["mot3d","Dot tracking in 3D (best in VR)","All the dots are the same color. Keep track of the few that glow on and off as they move nearer and farther as well as around you. When they stop, point to them. Say the center letter out loud each time it changes (every 3 seconds)."],
    ["gate","Head-steady category catch","Keep your head pointing at the center ring (in VR a laser shows where your head points). Items flash at the edges of your vision: squeeze the trigger, or tap, only when an item fits the rule shown, such as CAPITAL letters, odd numbers or round shapes. Do not look at them."],
-   ["trace","Laser tracing with words (VR)","Trace the blue path with your controller\u2019s laser, following the green guide, while reading the words in the center. Shake your head quickly when a word fits the category. On a tablet, trace with your finger."]
+   ["trace","Line tracing: spell the word","Keep your eyes on the bullseye in the center the whole time. A letter moves along the line and changes as it goes: without looking at it, notice each letter. Together they spell a word you will be asked for at the end. In VR, trace the line with your controller\u2019s laser while your eyes stay on the bullseye."],
+   ["tracec","Line tracing: color match","Keep your eyes on the color word in the center. A shape moves along the line and changes color. Say \u201cmatch\u201d, or tap, whenever the center word names the shape\u2019s current color (about 1 word in 5). In VR, trace the line with your laser and shake your head for a match."]
   ].forEach(function(r){ var e=mk("Periph",r[1],r[2],"","ocular",2,45); e.pt=r[0]; out.push(e); });
 
   /* v27: cervicogenic kinesthetic training: head-laser mazes */
   [["space","Space station"],["garden","Hedge garden"],["coral","Coral reef"],["circuit","Circuit pathway"],["wire","Wire loop"]].forEach(function(r){
     var e=mk("Cervico","Head-laser maze: "+r[1],(r[0]==="wire"?"Steer the laser that points out from between your eyes along the glowing wire, from the green start to the gold end, without touching the edges.":"Steer the laser that points out from between your eyes through the maze, from the green start to the gold exit, without touching the walls.")+" Move your head smoothly; keep your shoulders still. On a tablet, trace with your finger.","","ocular",2,90);
     e.mz=r[0]; e.longSet=90; out.push(e); });
+  /* v38: head-steady, position-sense and fast head-turn tasks (same laser input as the mazes) */
+  [["steadyrot","Head-steady rotation","Point the laser dot into the box and keep it there the whole time while you slowly turn your body (shoulders and trunk) left and right underneath your head. Follow the prompts. Move slowly and stop if you feel dizzy."],
+   ["steadyside","Head-steady side-bend","Point the laser dot into the box and keep it there while you slowly bend your head sideways, ear toward shoulder, back to the middle, then to the other side. Follow the prompts."],
+   ["jpe","Eyes-closed position error","Put the laser dot on the green target and hold it. When you hear \u201cclose your eyes\u201d, close them and turn your head to where the gold target was. Hold still, or press the clicker, when you think you are there. Open your eyes at the tone, then move onto the gold target and hold it for 2 seconds to get the next one."],
+   ["fastvor","Fast head turns to targets","Keep your eyes on the center bullseye the whole time. When a target appears (near the edge of the screen, or about 30 degrees out in VR), turn your head as fast as you can to hit it with the laser dot while your eyes stay on the bullseye, then come back to the bullseye. The next target appears 2 seconds after you are back."]
+  ].forEach(function(r){ var e=mk("Cervico",r[1],r[2],"","ocular",2,60); e.mz=r[0]; e.longSet=60; out.push(e); });
 
   /* Optokinetic (moving visual field) habituation. Never pre-selected. */
   [["left","moving left"],["right","moving right"],["up","moving up"],["down","moving down"]].forEach(function(d){
@@ -1191,6 +1259,9 @@ function buildExercises(level){
     vdiag.push(["VOR x2 diagonal: up-left and down-right","Move your head and the target in opposite directions along the diagonal while keeping the target clear.","diagonal","gaze",2,30]);
   }
   v.forEach(function(r){ out.push(mk("VOR", r[0], r[1], r[2], r[3], r[4], r[5])); });
+  /* v38: moving word search: read while the head moves side to side and the page drifts nearer and farther */
+  var wsx=mk("VOR","Moving word search","Move your head quickly side to side while you keep reading the page. The page drifts toward you and away from you. Real words are hidden among the random letters: say each one out loud as you find it. The lines get smaller toward the bottom.","","gaze",2,30);
+  wsx.pt="wsearch"; wsx.longSet=45; out.push(wsx);
   vdiag.forEach(function(r){ var e=mk("VOR", r[0], r[1], r[2], r[3], r[4], r[5]); e.optin=true; out.push(e); });
   /* remembered target and eye–head gaze shifts (trial-based, opt-in) */
   [["h","horizontal","to the side"],["v","vertical","up or down"]].forEach(function(a){
@@ -1237,7 +1308,13 @@ var TYPE_NAMES={Ocular:"Ocular",VOR:"Vestibular / VOR",Motion:"Visual motion",Ba
 function mazeOptsHtml(){ if(!S.list || !S.list.some(function(e){ return e.on && e.mz; })) return "";
   var seg=function(k,opts,cur2,lab){ return '<div class="pgroup" role="group" aria-label="'+lab+'"><b>'+lab+'</b><div class="seg">'+opts.map(function(o){ return '<button data-act="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(cur2===o[0])+'">'+o[1]+'</button>'; }).join("")+'</div></div>'; };
   return '<div class="panel bgpick"><h3 style="margin:0">Maze options</h3>'+seg("mz-cx",[["simple","Simple"],["medium","Medium"],["complex","Complex"]],mzOpt("mzCx","medium"),"Maze complexity")+
-    seg("mz-dist",[["calm","Calm"],["some","Some movement"],["busy","Busy"]],mzOpt("mzDist","some"),"Distractions around the maze")+'<small>The level sets the corridor width: narrower at higher levels.</small></div>'; }
+    seg("mz-dist",[["calm","Calm"],["some","Some movement"],["busy","Busy"]],mzOpt("mzDist","some"),"Distractions around the maze")+
+    seg("mz-input",[["touch","Finger or mouse"],["head","Head pointer (air mouse)"]],mzOpt("mzInput","touch"),"On a tablet or computer, steer with")+
+    (mzHead()?seg("mz-gain",[["low","Low"],["medium","Medium"],["high","High"]],mzOpt("mzGain","medium"),"Head-pointer sensitivity")+
+      seg("mz-invx",[["no","Normal"],["yes","Reversed"]],mzOpt("mzInvX","no"),"Left\u2013right")+
+      seg("mz-invy",[["no","Normal"],["yes","Reversed"]],mzOpt("mzInvY","no"),"Up\u2013down")+
+      '<small>Head pointer: strap a Bluetooth air mouse to the forehead and pair it with the tablet. Head turns move the laser dot; the clicker button starts and re-centers. If the dot moves the wrong way, set Reversed. Sensitivity and smoothing can also be changed during the session under Adjust.</small>':'')+
+    '<small>The level sets the corridor width: narrower at higher levels.</small></div>'; }
 function typeSwitches(list, scope){
   return '<div class="typesw" role="group" aria-label="Exercise types">'+["Ocular","VOR","Motion","Balance","Periph","Cervico"].map(function(c){
     var n=list.filter(function(x){ return x.cat===c; }).length, on=list.filter(function(x){ return x.cat===c && x.on; }).length;
@@ -2431,7 +2508,17 @@ document.addEventListener("click",function(ev){
     case "pt-score": ptScore(v==="1"); break;
     case "mz-cx": if(P){ P.prefs.mzCx=v; saveDB(); } rerender(); break;
     case "mz-dist": if(P){ P.prefs.mzDist=v; saveDB(); } rerender(); break;
+    case "mz-input": if(P){ P.prefs.mzInput=v; saveDB(); } rerender(); break;
+    case "mz-gain": if(P){ P.prefs.mzGain=v; saveDB(); } rerender(); break;
+    case "mz-invx": if(P){ P.prefs.mzInvX=v; saveDB(); } rerender(); break;
+    case "mz-invy": if(P){ P.prefs.mzInvY=v; saveDB(); } rerender(); break;
     case "pt-found": ptFound(+v); break;
+    case "pt-cx": ptSetCx(+v); break;
+    case "ws-n": wsCount(+v); break;
+    case "ws-show": wsShow(); break;
+    case "pt-spell": ptSpell(v==="1"); break;
+    case "pt-cmatch": ptColorScore(v==="1"); break;
+    case "terms": openDlg("termsDlg"); break;
     case "season-pick": if(P){ P.prefs.season=v; saveDB(); } rerender(); announce("Season: "+v); break;
     case "theme-pick": S.bgTheme=themeOf(v); if(isScene(S.bgTheme) && S.bgPick==="6") S.bgPick="5"; rerender(); announce("Background theme: "+THEMES[S.bgTheme].name+"."); break;
     case "chk": chkAnswer(v); break;
@@ -2514,6 +2601,9 @@ function tv(k){
     case "dist": return calObj().distCm; case "letterDeg": return dp.letter; case "letterSec": return P.prefs.letterSec;
     case "rangeH": return dp.h; case "rangeV": return dp.v; case "speedDeg": return dp.speed;
     case "oknDeg": return dp.okn; case "stripeDeg": return 4;
+    case "ptCx": return ptLevel();
+    case "hpGain": return {low:0.6, medium:1, high:1.6}[mzOpt("mzGain","medium")]||1;
+    case "hpSmooth": return 0.35;
     case "sacInt": var b=basePace()/speed(); return +(c.path==="random-step"? b*2/6 : b/2).toFixed(2);
   }
   return null;
@@ -2532,6 +2622,8 @@ function tuneSpec(c){
   if((c.demo==="ocular"||c.demo==="gaze") && (c.path||c.task)) g.push({h:"Movement range"+approx,items:[["rangeH","Horizontal ±",2,40,1,"°"],["rangeV","Vertical ±",2,30,1,"°"]]});
   if(c.demo==="ocular" && c.path && !/-step$/.test(c.path)) g.push({h:"Target speed",items:[["speedDeg","Pursuit speed"+approx,2,80,1,"°/s"]]});
   if(/-step$/.test(c.path||"")) g.push({h:"Saccade timing",items:[["sacInt","Time between jumps",0.3,4,0.1," s"]]});
+  if(c.mz && mzHead()) g.push({h:"Head pointer",items:[["hpGain","Sensitivity: how far the dot moves per head turn",0.3,3,0.1,"\u00d7"],["hpSmooth","Smoothing: steadies small tremors (adds a little lag)",0,1,0.05,""]]});
+  if(c.pt && c.pt!=="wsearch") g.push({h:"Peripheral complexity",items:[["ptCx","More targets, faster and more varied"+(/^trace/.test(c.pt)?" (longer, twistier lines)":""),1,6,1,"",function(v){ return v+" of 6 \u00b7 "+PT_CX_NAMES[v]; }]]});
   if(c.demo==="okn") g.push({h:"Stripes",items:[["oknDeg","Stripe speed"+approx,2,80,1,"°/s"],["stripeDeg","Stripe width",1,10,0.5,"°"]]});
   var T={
     memory:[["lookS","Look at the target",0.5,6,0.5," s"],["darkS","Screen blank (head turn)",1,10,0.5," s"],["revealS","Target shown again",0.5,5,0.5," s"],["offset","Target position varies",0,1,0.05,"",pct]],
@@ -3057,6 +3149,10 @@ function texRing(){
     g.beginPath(); g.arc(w/2,h/2,w*0.06,0,2*Math.PI); g.fillStyle="#ffffff"; g.fill();
   }, col);
 }
+function texGlow(name,color){                                          /* bright core, colored body, soft halo */
+  return vrCanvasTex(name,128,128,function(g,w,h){ g.clearRect(0,0,w,h); var gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);
+    gr.addColorStop(0,"#ffffff"); gr.addColorStop(0.16,"#ffffff"); gr.addColorStop(0.3,color); gr.addColorStop(0.5,color); gr.addColorStop(0.62,"rgba(255,255,255,.0)"); g.fillStyle=gr; g.fillRect(0,0,w,h);
+    var hl=g.createRadialGradient(w/2,h/2,w*0.25,w/2,h/2,w/2); hl.addColorStop(0,color); hl.addColorStop(1,"rgba(0,0,0,0)"); g.globalAlpha=0.55; g.fillStyle=hl; g.fillRect(0,0,w,h); g.globalAlpha=1; }, color+"G"); }
 function texDot(name,color,glow){
   return vrCanvasTex(name,128,128,function(g,w,h){ g.clearRect(0,0,w,h);
     if(glow){ var gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2); gr.addColorStop(0,color); gr.addColorStop(.55,color); gr.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle=gr; g.fillRect(0,0,w,h); }
@@ -3206,6 +3302,7 @@ function vrFrame(ts, frame){
   var dt=VR.lastTs ? Math.min(100, ts-VR.lastTs) : 0; VR.lastTs=ts;
   var p=pose.transform.position, f=qrot(pose.transform.orientation,[0,0,-1]);
   var yaw=Math.atan2(-f[0],-f[2]), pitch=Math.asin(Math.max(-1,Math.min(1,f[1])));
+  var rax=qrot(pose.transform.orientation,[1,0,0]); VR._hr=Math.asin(Math.max(-1,Math.min(1,rax[1])));   /* head tilt (side-bend): + = toward the left shoulder */
   if(!VR.origin){ VR.origin=[p.x,p.y,p.z]; VR.yaw0=yaw; VR.floorY=VR.floorMode?0:p.y-1.2; }
   var ry=yaw-VR.yaw0; while(ry>Math.PI) ry-=2*Math.PI; while(ry<-Math.PI) ry+=2*Math.PI;
   if(sessionLive()) vrTrackHead(ry, pitch, dt);
@@ -5905,11 +6002,33 @@ function ptLayer(){ var st=$("#stage"); if(!st) return null; var L=$("#ptLayer")
 function ptPanel(kind){
   var p=$("#ptPanel"), st=$("#stage"); if(!st) return; if(!p){ p=document.createElement("div"); p.id="ptPanel"; p.className="pt-panel"; st.appendChild(p); }
   if(!kind){ p.hidden=true; return; } p.hidden=false;
+  if(kind==="gate"){ p.innerHTML=ptMeterHtml(); return; }
   if(kind==="mot"){ var T=(PT.trial&&PT.trial.nT)||3, b=""; for(var i=0;i<=T;i++) b+='<button class="btn sm" data-act="pt-found" data-v="'+i+'">'+i+'</button>'; p.innerHTML='<span>Found</span>'+b+'<span class="muted">of '+T+'</span>'; }
   else if(kind==="where") p.innerHTML='<span>Direction</span><button class="btn sm" data-act="pt-score" data-v="1">Correct</button><button class="btn sm" data-act="pt-score" data-v="0">Wrong</button>';
-  else if(kind==="trace") p.innerHTML='<span>Word match</span><button class="btn sm" data-act="pt-score" data-v="1">Caught it</button><button class="btn sm" data-act="pt-score" data-v="0">Missed</button>';
+  else if(kind==="trace") p.innerHTML='';
+  else if(kind==="tracec") p.innerHTML='<span>Color match</span><button class="btn sm" data-act="pt-cmatch" data-v="1">Caught it</button><button class="btn sm" data-act="pt-cmatch" data-v="0">Missed</button>';
   else p.innerHTML='<span>Clinician</span><button class="btn sm" data-act="pt-score" data-v="1">Seen</button><button class="btn sm" data-act="pt-score" data-v="0">Missed</button>';
+  if(kind==="wsearch"){ p.innerHTML=wsPanelHtml(); return; }
+  p.insertAdjacentHTML("beforeend",ptMeterHtml());
 }
+/* complexity 1-6 (starts at the chosen level): more targets at once, more often, more colors and sizes */
+var PT_CX_NAMES=["","Calm","Light","Moderate","Busy","Very busy","Maximum"];
+function ptCx(){ var t=S.sess&&S.sess.tune, v=t&&t.ptCx!=null?t.ptCx:ptLevel(); return Math.max(1,Math.min(6,Math.round(v))); }
+function ptSetCx(d){ var v=Math.max(1,Math.min(6,ptCx()+d)); setTune("ptCx",v); syncTune("ptCx",v); ptMeterSync(); toast("Complexity "+v+" of 6 \u00b7 "+PT_CX_NAMES[v]); }
+function ptMeterHtml(){ var v=ptCx(), b=""; for(var i=1;i<=6;i++) b+='<i class="'+(i<=v?"on":"")+'"></i>';
+  return '<span class="pt-meter" role="group" aria-label="Complexity '+v+' of 6"><span>Complexity</span><button class="btn sm" data-act="pt-cx" data-v="-1" aria-label="Less complex">\u2212</button><span class="pt-bar" aria-hidden="true">'+b+'</span><button class="btn sm" data-act="pt-cx" data-v="1" aria-label="More complex">+</button><small>'+PT_CX_NAMES[v]+'</small></span>'; }
+function ptMeterSync(){ var m=document.querySelector("#ptPanel .pt-meter"); if(m) m.outerHTML=ptMeterHtml(); if(PT.st) PT.st.cxShown=ptCx(); }
+/* colors ranked by how well they stand out on the current background; a ring that contrasts too */
+function ptBgs(){ var sc=sessionScene(); return sc?sceneBgColors(sc.t,sc.lv):[cssVar("--stage","#0f1d22")]; }
+function ptPalette(){ var bgs=ptBgs(); return TARGET_PALETTE.map(function(c){ var w=Infinity; bgs.forEach(function(b){ w=Math.min(w,contrastOf(c,b)*(1+hueDist(c,b)/765)); }); return [c,w]; }).sort(function(a,b){ return b[1]-a[1]; }).map(function(x){ return x[0]; }); }
+function ptRing(){ var bgs=ptBgs(), L=bgs.reduce(function(a,b){ return a+lumOf(b); },0)/bgs.length; return L>0.25?"#0b1020":"#ffffff"; }
+function ptShapeSvg(shape,col,ring,sz){ var h=sz/2, sw=Math.max(2,sz*0.09), r=h-sw, p;
+  if(shape==="square") p='<rect x="'+sw+'" y="'+sw+'" width="'+(sz-2*sw)+'" height="'+(sz-2*sw)+'" rx="'+(sz*0.1)+'"/>';
+  else if(shape==="diamond") p='<polygon points="'+h+','+sw+' '+(sz-sw)+','+h+' '+h+','+(sz-sw)+' '+sw+','+h+'"/>';
+  else if(shape==="star") p='<polygon stroke-linejoin="round" points="'+[0,1,2,3,4,5,6,7,8,9].map(function(i){ var rr=i%2?r*0.45:r, a=-Math.PI/2+i*Math.PI/5; return (h+rr*Math.cos(a)).toFixed(1)+","+(h+rr*Math.sin(a)).toFixed(1); }).join(" ")+'"/>';
+  else p='<circle cx="'+h+'" cy="'+h+'" r="'+r+'"/>';
+  return '<svg viewBox="0 0 '+sz+' '+sz+'" fill="'+col+'" stroke="'+ring+'" stroke-width="'+sw+'">'+p+'</svg>'; }
+var PT_RATE=[1,0.85,0.7,0.55,0.45,0.36], PT_AT_ONCE=[1,1,2,2,3,4];
 /* starting difficulty by level; it then adapts trial by trial */
 function ptStart(type){
   var lv=ptLevel();
@@ -5917,10 +6036,12 @@ function ptStart(type){
     nT:Math.min(5,1+Math.ceil(lv/2)), nD:4+lv*2, spd:2+lv*1.6, next:performance.now()+1500};
   PT.trial=null; ptClear();
   var d=$("#demo"); if(d) d.classList.toggle("pt-hide",true);
-  if(!/^mot|trace/.test(type)){ var cl=document.createElement("div"); cl.className="pt-center"; ptLayer().appendChild(cl); PT.st.centerEl=cl; PT.st.centerT=0; }
-  ptPanel(/^mot/.test(type)?"mot":type==="where"?"where":type==="trace"?"trace":type==="gate"?null:"pop");
+  PT.st.cxShown=ptCx();
+  if(!/^trace/.test(type) && type!=="wsearch"){ var cl=document.createElement("div"); cl.className="pt-center"; ptLayer().appendChild(cl); PT.st.centerEl=cl; PT.st.centerT=0; }
+  ptPanel(/^mot/.test(type)?"mot":type==="where"?"where":/^trace|^wsearch/.test(type)?type:type==="gate"?"gate":"pop");
   if(type==="gate"){ var gl=document.createElement("div"); gl.className="pt-label"; ptLayer().appendChild(gl); PT.st.ruleEl=gl; PT.st.ruleName=null; gl.textContent="Squeeze the trigger (or tap) only for: "+gateRule().name; PT.headN=0; PT.headOk=0; }
-  if(type==="trace") ptTraceStart();
+  if(/^trace/.test(type)) ptTraceStart();
+  if(type==="wsearch") wsStart();
 }
 function ptClear(){ var L=ptLayer(); if(L) L.innerHTML=""; PT.dots=[]; }
 function ptStop(){ ptClear(); ptPanel(null); var d=$("#demo"); if(d) d.classList.remove("pt-hide"); PT.st=null; PT.trial=null; }
@@ -5933,84 +6054,205 @@ function ptAdapt(ok){ var st=PT.st; if(!st) return;
 function ptScore(ok, rt){                                                /* score the latest pop-up or trace word */
   var t=PT.trial; if(!t || t.scored || !PT.st) return; t.scored=true;
   ptLog({type:PT.st.type, sector:t.sector, ecc:t.ecc, ok:!!ok, rt:rt||null}); ptAdapt(!!ok);
-  if(t.el) t.el.classList.add(ok?"pt-hit":"pt-miss");
+  (t.els||(t.el?[t.el]:[])).forEach(function(e){ e.classList.add(ok?"pt-hit":"pt-miss"); });
   toast(ok?(rt?"Seen · "+Math.round(rt)+" ms":"Seen"):"Missed");
 }
 /* ---------- pop-ups (also "where was it?" and "spot it in a moving scene") ---------- */
 function ptPop(now){
-  var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), ppd=degSize(1);
-  var sector=Math.floor(Math.random()*8), a=sector*Math.PI/4+R(-0.25,0.25), maxR=Math.min(sr.width,sr.height)/2-30, rad=Math.min(maxR*(sector%4===0?1.9:1), st.ecc*ppd);
-  rad=Math.min(rad, Math.abs(Math.cos(a))>0.01?(sr.width/2-30)/Math.abs(Math.cos(a)):1e9, Math.abs(Math.sin(a))>0.01?(sr.height/2-30)/Math.abs(Math.sin(a)):1e9);
-  var sz=Math.max(18,st.size*ppd), el=document.createElement("div"), col=pick(["#ffe14a","#ff3df0","#00e5ff","#39ff14","#ff6a00","#ffffff"]), shp=pick(["circle","square","star","diamond"]);
-  el.className="pt-pop pt-"+shp; el.style.cssText="width:"+sz+"px;height:"+sz+"px;left:"+(sr.width/2+rad*Math.cos(a)-sz/2)+"px;top:"+(sr.height/2-rad*Math.sin(a)-sz/2)+"px;--pc:"+col+";opacity:"+st.contrast;
-  L.appendChild(el); setTimeout(function(){ el.classList.add("gone"); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },400); }, st.dur);
-  PT.trial={t0:now, sector:sector, ecc:+(rad/ppd).toFixed(1), el:el, scored:false, az:Math.cos(a)*rad/ppd, el2:Math.sin(a)*rad/ppd};
-  st.next=now+st.dur+R(1800,3600)-st.lv*120;
+  var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), ppd=degSize(1), cx=ptCx(), nAt=PT_AT_ONCE[cx-1];
+  var pal=ptPalette().slice(0,cx<=1?1:cx<=2?2:cx<=4?3:4), ring=ptRing(), shapes=cx<=1?["circle"]:cx<=2?["circle","square"]:["circle","square","star","diamond"];
+  var used={}, els=[], first=null;
+  for(var k=0;k<nAt;k++){
+    var sector=Math.floor(Math.random()*8), tries=0; while(used[sector] && tries++<12) sector=Math.floor(Math.random()*8); used[sector]=1;
+    var a=sector*Math.PI/4+R(-0.25,0.25), maxR=Math.min(sr.width,sr.height)/2-30, ecc=st.ecc*(k?R(0.7,1.25):1), rad=Math.min(maxR*(sector%4===0?1.9:1), ecc*ppd);
+    var sz=Math.max(18,st.size*ppd*(cx>=3?R(0.65,1.5):1));
+    rad=Math.min(rad, Math.abs(Math.cos(a))>0.01?(sr.width/2-sz/2-10)/Math.abs(Math.cos(a)):1e9, Math.abs(Math.sin(a))>0.01?(sr.height/2-sz/2-10)/Math.abs(Math.sin(a)):1e9);
+    var col=pick(pal), shp=pick(shapes), el=document.createElement("div");
+    el.className="pt-pop"+(cx>=2?" glow":""); el.style.cssText="width:"+sz+"px;height:"+sz+"px;left:"+(sr.width/2+rad*Math.cos(a)-sz/2)+"px;top:"+(sr.height/2-rad*Math.sin(a)-sz/2)+"px;--pc:"+col+";opacity:"+Math.max(0.75,st.contrast);
+    el.innerHTML=ptShapeSvg(shp,col,ring,sz); L.appendChild(el); els.push(el);
+    (function(e){ setTimeout(function(){ e.classList.add("gone"); setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); },400); }, st.dur*(k?R(0.8,1.3):1)); })(el);
+    if(!first) first={sector:sector, ecc:+(rad/ppd).toFixed(1), el:el, az:Math.cos(a)*rad/ppd, el2:Math.sin(a)*rad/ppd, col:col, sz:st.size*(sz/Math.max(18,st.size*ppd))};
+  }
+  PT.trial={t0:now, sector:first.sector, ecc:first.ecc, el:first.el, els:els, n:nAt, scored:false, az:first.az, el2:first.el2, vr:els.map(function(e,i){ return null; })};
+  PT.trial.vrPts=[];  /* VR copies of each target */
+  els.forEach(function(e){ var r=e.getBoundingClientRect(), c2=$("#stage").getBoundingClientRect(), x=(r.left+r.width/2-c2.left-c2.width/2)/ppd, y=-(r.top+r.height/2-c2.top-c2.height/2)/ppd; PT.trial.vrPts.push({az:x, el:y, col:e.style.getPropertyValue("--pc"), s:r.width/ppd}); });
+  st.next=now+st.dur+Math.max(400,(R(1800,3600)-st.lv*120)*PT_RATE[cx-1]/speed());   /* Target speed: faster = more frequent flashes */
 }
 /* ---------- dot tracking ---------- */
 function ptMotStart(now){
-  var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), W=sr.width, H=sr.height, ppd=degSize(1), n=st.nT+st.nD, cols=st.type==="motc";
-  ptClear(); var colT=pick(PT_COLORS);
+  var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), W=sr.width, H=sr.height, ppd=degSize(1), cx=ptCx(), nD=Math.max(2,st.nD+(cx-st.lv)*2+(cx>=5?4:0)), n=st.nT+nD, cols=st.type==="motc";
+  var keep=st.centerEl; ptClear(); if(keep){ ptLayer().appendChild(keep); } var colT=pick(PT_COLORS), pal=ptPalette(), ring=ptRing(), calm=pal[0], mix=pal.slice(0,4);
   PT.trial={phase:"cue", t0:now, nT:st.nT, colName:colT[0], scored:false, depth:st.type==="mot3d"};
-  for(var i=0;i<n;i++){ var el=document.createElement("div"), tgt=i<st.nT, c=cols?(tgt?colT[1]:pick(PT_COLORS.filter(function(x){ return x[0]!==colT[0]; }))[1]):"#64748b";
-    el.className="pt-dot"+(tgt&&!cols?" cue":""); el.style.setProperty("--dc",c); L.appendChild(el);
-    var sp=st.spd*ppd*R(0.7,1.2), ang=R(0,6.28);
-    PT.dots.push({el:el, x:R(W*0.1,W*0.9), y:R(H*0.1,H*0.9), z:R(0.3,1), vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, vz:R(-0.25,0.25), tgt:tgt, W:W, H:H}); }
+  for(var i=0;i<n;i++){ var el=document.createElement("div"), tgt=i<st.nT, c=cols?(tgt?colT[1]:pick(PT_COLORS.filter(function(x){ return x[0]!==colT[0]; }))[1]):(cx>=3?pick(mix):calm);
+    var ds=Math.round(28*(cx>=3?R(0.7,1.4):1)); if(!cols) c=ring==="#ffffff"?"#7d8aa3":"#3f4a5c";   /* glowing-dot tasks: every dot the same plain color */
+    el.className="pt-dot"+(cols?"":" plain"+(tgt?" blink":"")); el.style.setProperty("--dc",c); el.style.setProperty("--pr",ring); el.style.width=el.style.height=ds+"px"; L.appendChild(el);
+    var sp=st.spd*ppd*R(0.7,1.2)*(1+0.07*(cx-3)), ang=R(0,6.28), px, py, tr=0;
+    do{ px=R(W*0.1,W*0.9); py=R(H*0.1,H*0.9); } while(Math.hypot(px-W/2,py-H/2)<60 && tr++<20);   /* start clear of the center letter */
+    PT.dots.push({el:el, x:px, y:py, z:R(0.3,1), vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, vz:R(-0.25,0.25), tgt:tgt, W:W, H:H, r:ds/2, s:ds/28}); }
   ptPanel("mot");
-  var lab=document.createElement("div"); lab.className="pt-label"; lab.textContent=cols?"Track the "+colT[0]+" dots":"Remember the glowing dots"; L.appendChild(lab); PT.trial.lab=lab;
+  var lab=document.createElement("div"); lab.className="pt-label"; lab.textContent=cols?"Track the "+colT[0]+" dots":"Keep track of the dots that glow on and off"; L.appendChild(lab); PT.trial.lab=lab;
 }
 function ptMotFrame(now, dt){
   var t=PT.trial, st=PT.st; if(!t) return;
-  if(t.phase==="cue" && now-t.t0>2200){ t.phase="move"; t.t1=now; PT.dots.forEach(function(d){ d.el.classList.remove("cue"); }); if(t.lab) t.lab.textContent=st.type==="motc"?"Keep tracking the "+t.colName+" dots":"Keep tracking"; }
+  if(t.phase==="cue" && now-t.t0>2200){ t.phase="move"; t.t1=now; PT.dots.forEach(function(d){ d.el.classList.remove("cue"); }); if(t.lab) t.lab.textContent=st.type==="motc"?"Keep tracking the "+t.colName+" dots":"Keep tracking the glowing dots"; }
   if(t.phase==="move"){
     PT.dots.forEach(function(d){ if(Math.random()<0.02){ var a=Math.atan2(d.vy,d.vx)+R(-0.8,0.8), sp=Math.hypot(d.vx,d.vy); d.vx=Math.cos(a)*sp; d.vy=Math.sin(a)*sp; }   /* random changes of direction */
-      d.x+=d.vx*dt; d.y+=d.vy*dt; if(t.depth){ d.z+=d.vz*dt; if(d.z<0.3||d.z>1.2) d.vz*=-1; }
+      var k=speed(); d.x+=d.vx*dt*k; d.y+=d.vy*dt*k; if(t.depth){ d.z+=d.vz*dt*k; if(d.z<0.3||d.z>1.2) d.vz*=-1; }
       if(d.x<20||d.x>d.W-20) d.vx*=-1; if(d.y<20||d.y>d.H-20) d.vy*=-1; });
-    if(now-t.t1>6000+st.lv*600){ t.phase="stop"; t.t2=now; PT.dots.forEach(function(d){ d.el.style.setProperty("--dc","#64748b"); }); if(t.lab) t.lab.textContent="Point to the dots you tracked"; }
+    if(now-t.t1>6000+st.lv*600){ t.phase="stop"; t.t2=now; PT.dots.forEach(function(d){ d.el.classList.add("stop"); }); if(t.lab) t.lab.textContent="Point to the dots you tracked"; }
   }
-  PT.dots.forEach(function(d){ var s=t.depth?d.z:1; d.el.style.transform="translate("+(d.x-12)+"px,"+(d.y-12)+"px) scale("+s.toFixed(2)+")"; d.el.style.zIndex=String(Math.round(d.z*10)); });
+  PT.dots.forEach(function(d){ var s=t.depth?d.z:1; d.el.style.transform="translate("+(d.x-(d.r||14))+"px,"+(d.y-(d.r||14))+"px) scale("+s.toFixed(2)+")"; d.el.style.zIndex=String(Math.round(d.z*10)); });
   if(t.phase==="stop" && (t.scored || now-t.t2>9000)) ptMotStart(now+300);
 }
 function ptFound(k){ var t=PT.trial; if(!t||t.scored||!/^mot/.test(PT.st.type)) return; t.scored=true; ptLog({type:PT.st.type, found:k, of:t.nT, spd:+PT.st.spd.toFixed(1)}); ptAdapt(k>=t.nT?true:k<t.nT/2?false:null); toast("Found "+k+" of "+t.nT); }
 /* ---------- laser tracing with words (VR; on a tablet, trace with a finger) ---------- */
-function ptTraceStart(){ var st=PT.st, c=pick(PT_CATS); st.cat=c; st.word=null; st.wordT=0; st.path=pick(["zigzag","loops","spiral","letter"]); st.letter=pick(["S","M","W","2","3","8"]); st.trace={n:0, onPath:0};
-  var L=ptLayer(), lab=document.createElement("div"); lab.className="pt-label"; lab.textContent="Category: "+c[0]+" · shake your head when a word fits"; L.appendChild(lab);
-  var w=document.createElement("div"); w.className="pt-word"; L.appendChild(w); st.wordEl=w; ptDrawPath(); }
-function ptPathPts(kind, n, letter){ var pts=[], i, t;
-  if(kind==="zigzag") for(i=0;i<=n;i++){ t=i/n; pts.push([-0.85+1.7*t, (Math.floor(t*8)%2? -1:1)*(0.6-1.2*((t*8)%1))*(Math.floor(t*8)%2?-1:1)]); }
-  else if(kind==="loops") for(i=0;i<=n;i++){ t=i/n*Math.PI*2*3; pts.push([-0.8+1.6*i/n+0.18*Math.cos(t), 0.5*Math.sin(t)]); }
-  else if(kind==="spiral") for(i=0;i<=n;i++){ t=i/n*Math.PI*6; var r=0.08+0.8*i/n; pts.push([r*Math.cos(t), r*Math.sin(t)*0.8]); }
-  else { var G={S:[[0.6,0.7],[-0.6,0.7],[-0.6,0],[0.6,0],[0.6,-0.7],[-0.6,-0.7]],M:[[-0.7,-0.7],[-0.7,0.7],[0,0],[0.7,0.7],[0.7,-0.7]],W:[[-0.8,0.7],[-0.4,-0.7],[0,0.3],[0.4,-0.7],[0.8,0.7]],"2":[[-0.6,0.5],[0,0.75],[0.6,0.5],[-0.6,-0.7],[0.6,-0.7]],"3":[[-0.6,0.7],[0.6,0.7],[0,0],[0.6,-0.7],[-0.6,-0.7]],"8":[[0,0],[0.5,0.4],[0,0.75],[-0.5,0.4],[0,0],[0.5,-0.4],[0,-0.75],[-0.5,-0.4],[0,0]]}[letter];
-    for(i=0;i<G.length-1;i++) for(var j=0;j<20;j++){ t=j/20; pts.push([G[i][0]+(G[i+1][0]-G[i][0])*t, G[i][1]+(G[i+1][1]-G[i][1])*t]); } pts.push(G[G.length-1]); }
-  return pts; }
-function ptDrawPath(){ var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), W=sr.width, H=sr.height, pts=ptPathPts(st.path,240,st.letter); st.pts=pts;
-  var sx=function(p){ return W/2+p[0]*W*0.42; }, sy=function(p){ return H/2-p[1]*H*0.42; };
-  var svg='<svg class="pt-path" width="'+W+'" height="'+H+'"><polyline fill="none" stroke="rgba(56,200,255,.75)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" points="'+pts.map(function(p){ return sx(p).toFixed(0)+","+sy(p).toFixed(0); }).join(" ")+'"/></svg>';
-  L.insertAdjacentHTML("afterbegin",svg); var g=document.createElement("div"); g.className="pt-guide"; L.appendChild(g); st.guide=g; st.sx=sx; st.sy=sy; }
-function ptTraceFrame(now){ var st=PT.st; if(!st.pts) return;
-  var per=Math.max(8000,22000-st.lv*2200), q=(now%per)/per, p=st.pts[Math.floor(q*(st.pts.length-1))]; st.guide.style.transform="translate("+(st.sx(p)-14)+"px,"+(st.sy(p)-14)+"px)"; st.guidePt=p;
-  if(now-st.wordT>Math.max(1300,2800-st.lv*250)){ st.wordT=now; var match=Math.random()<0.35, pool=match?st.cat[1]:[].concat.apply([],PT_CATS.filter(function(c){ return c!==st.cat; }).map(function(c){ return c[1]; }));
-    var w=pick(pool); st.word={w:w, match:match, t:now, caught:false}; st.wordEl.textContent=w;
-    if(PT.trial && PT.trial.match && !PT.trial.scored){ ptLog({type:"trace-word", ok:false}); }   /* a fitting word went by without a shake */
-    PT.trial={match:match, scored:!match, t0:now}; }
+function ptTraceLabel(){ var st=PT.st, vr=VR.session?" \u00b7 trace the line with your laser":" \u00b7 keep your head still";
+  return (st.type==="tracec"?"Keep your eyes on the center word":"Keep your eyes on the bullseye the whole time")+vr; }
+function ptTraceSub(){ var st=PT.st;
+  return st.type==="tracec"?(VR.session?"Shake your head":"Say \u201cmatch\u201d or tap")+" when the word names the moving shape\u2019s color":"Without looking at it, notice the moving letter \u00b7 the letters spell a word"; }
+function ptTraceStart(){ var st=PT.st, c=pick(PT_CATS); st.cat=c; st.word=null; st.wordT=0; st.trace={n:0, onPath:0}; st.sPos=0;
+  var L=ptLayer(), lab=document.createElement("div"); lab.className="pt-label"; lab.textContent=ptTraceLabel(); L.appendChild(lab); st.labEl=lab;
+  var sub=document.createElement("div"); sub.className="pt-label sub"; sub.textContent=ptTraceSub(); L.appendChild(sub); st.subEl=sub;
+  if(st.type==="tracec"){ var w=document.createElement("div"); w.className="pt-word"; L.appendChild(w); st.wordEl=w; }
+  else { var b=document.createElement("div"); b.className="pt-bull"; b.innerHTML='<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#fff"/><circle cx="32" cy="32" r="23" fill="#e11d48"/><circle cx="32" cy="32" r="16" fill="#fff"/><circle cx="32" cy="32" r="9" fill="#e11d48"/><circle cx="32" cy="32" r="3" fill="#fff"/></svg>'; L.appendChild(b); st.wordEl=null; }
+  ptDrawPath(); }
+/* color match: every word change also changes the shape's color; exactly 20% of each set's words match, in random order */
+var PT_TCOL=[["RED","#ef4444"],["BLUE","#3b82f6"],["GREEN","#22c55e"],["YELLOW","#facc15"],["PURPLE","#a855f7"],["ORANGE","#f97316"],["PINK","#ec4899"],["CYAN","#22d3ee"]];
+function ptColorInt(){ return Math.max(1400, 2900-PT.st.lv*220); }
+function ptColorSched(){ var st=PT.st, c=cur(), N=Math.max(5,Math.round(c.setSec*1000/ptColorInt())), q=N*0.2, m=Math.max(1,Math.floor(q)+(Math.random()<q-Math.floor(q)?1:0)), a=[];   /* random rounding: averages exactly 20% */
+  for(var i=0;i<N;i++) a.push(i<m); for(i=N-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; } st.cSched=a; st.cIdx=0; }
+function ptColorStep(now){ var st=PT.st, s2=S.sess, c=cur(), si=s2?Math.floor(s2.t/c.setSec):0;
+  if(si!==st.cSet || !st.cSched || st.cIdx>=st.cSched.length){ st.cSet=si; ptColorSched(); }
+  var cx=ptCx(), pool=PT_TCOL.slice(0,cx<=2?4:cx<=4?6:8), prev=st.cCol, col; do{ col=pick(pool); } while(prev && col[0]===prev[0] && pool.length>1);
+  var match=st.cSched[st.cIdx++], word=match?col[0]:pick(pool.filter(function(x){ return x[0]!==col[0]; }))[0];
+  st.cCol=col; st.guide.style.setProperty("--gc",col[1]); st.word={w:word, match:match, t:now}; st.wordEl.textContent=word;
+  PT.prevTrial=PT.trial; PT.trial={match:match, scored:!match, t0:now, fa:false}; }
+function ptColorResp(){ var st=PT.st, t=PT.trial, p=PT.prevTrial, now=performance.now(); if(!st||!t) return;
+  if(t.match && !t.scored){ t.scored=true; ptLog({type:"trace-color", ok:true, rt:now-t.t0}); toast("Match!"); return; }
+  if(p && p.match && !p.scored && now-t.t0<800){ p.scored=true; ptLog({type:"trace-color", ok:true, rt:now-p.t0}); toast("Match!"); return; }   /* a late answer to the word just gone */
+  if(!t.match && !t.fa){ t.fa=true; ptLog({type:"trace-fa"}); toast("Not a match"); } }
+function ptColorScore(ok){ var t=PT.trial, p=PT.prevTrial, tg=t&&t.match&&!t.scored?t:(p&&p.match&&!p.scored?p:null);
+  if(!tg){ toast("No match to score right now"); return; } tg.scored=true; ptLog({type:"trace-color", ok:!!ok}); toast(ok?"Caught it":"Missed"); }
+/* complexity 1-6 picks the kind of line and how long it is: sharp corners, right angles and zigzags */
+function ptPickPath(cx){ return pick([["zigzag","stairs"],["zigzag","stairs","box"],["stairs","box","walk","zigzag"],["walk","bolt","box"],["walk","bolt"],["walk","bolt"]][cx-1]); }
+function ptDense(C){ var pts=[], i, j; for(i=0;i<C.length-1;i++){ var a=C[i], b=C[i+1], n=Math.max(2,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.01)); for(j=0;j<n;j++) pts.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]); } pts.push(C[C.length-1]); return pts; }
+function ptPathPts(kind, n, letter, cx){ var C=[], i; cx=cx||3;
+  if(kind==="zigzag"){ var segs=3+cx*2; for(i=0;i<=segs;i++) C.push([-1+2*i/segs, i%2?-0.92:0.92]); }
+  else if(kind==="stairs"){ var st2=3+cx, up=true, x=-1, y=-0.92, dx=2/st2, dy=1.84/st2; C.push([x,y]);   /* right-angle steps, up and back down at higher complexity */
+    for(i=0;i<st2;i++){ x+=dx; C.push([x,y]); y+=up?dy:-dy; if(cx>=4 && i===Math.floor(st2/2)){ up=!up; } C.push([x,Math.max(-0.92,Math.min(0.92,y))]); y=Math.max(-0.92,Math.min(0.92,y)); } }
+  else if(kind==="box"){ var rings=1+Math.ceil(cx/2), r=1, g=1/(rings+0.5); C.push([-1,0.92]);   /* square spiral inward */
+    for(i=0;i<rings;i++){ var a=1-i*g, b=0.92-i*g*0.92; C.push([a,b]); C.push([a,-b]); C.push([-a+g,-b]); C.push([-a+g,b-g*0.92]); } }
+  else if(kind==="walk"){ var cols=8+cx, rows=5+Math.ceil(cx/2), steps=10+cx*5, gx=Math.floor(Math.random()*cols), gy=Math.floor(Math.random()*rows), dir=0, seen={}, D=[[1,0],[0,1],[-1,0],[0,-1]];   /* random right-angle path across the whole field */
+    var P=function(){ return [-1+2*gx/(cols-1), -0.92+1.84*gy/(rows-1)]; }; C.push(P()); seen[gx+","+gy]=1;
+    for(i=0;i<steps;i++){ var opts=[0,1,2,3].filter(function(d){ var nx=gx+D[d][0], ny=gy+D[d][1]; return nx>=0&&ny>=0&&nx<cols&&ny<rows&&!seen[nx+","+ny]; }); if(!opts.length) break;
+      var d2=opts.indexOf(dir)>=0 && Math.random()<0.45 ? dir : pick(opts), run=1+Math.floor(Math.random()*3);
+      for(var r2=0;r2<run;r2++){ var nx=gx+D[d2][0], ny=gy+D[d2][1]; if(nx<0||ny<0||nx>=cols||ny>=rows||seen[nx+","+ny]) break; gx=nx; gy=ny; seen[gx+","+gy]=1; }
+      if(d2!==dir || !C.length) C.push(P()); else C[C.length-1]=P(); dir=d2; }
+    if(C.length<4) return ptPathPts("zigzag",n,letter,cx); }
+  else { var m=6+cx*2, sweep=cx>=5?2:1; for(i=0;i<=m;i++){ var f=i/m*sweep, xx=f<=1?-1+2*f:1-2*(f-1); C.push([Math.max(-1,Math.min(1,xx+R(-0.08,0.08))), (i%2?-1:1)*R(0.3,0.92)]); } }   /* lightning bolt: sharp, uneven angles */
+  return ptDense(C); }
+var PT_SPELL=[["CAT","SUN","MAP","DOG","HAT","BUS","CUP"],["BIRD","LAMP","FISH","DOOR","MILK","TREE","BOAT"],["RIVER","APPLE","CHAIR","HOUSE","CLOUD","TRAIN"],["GARDEN","PLANET","BUTTER","WINDOW","CASTLE","ORANGE"]];
+function ptSpellWord(cx){ return pick(PT_SPELL[cx<=1?0:cx<=3?1:cx<=4?2:3]); }
+function ptDrawPath(){ var st=PT.st, L=ptLayer(), sr=$("#stage").getBoundingClientRect(), W=sr.width, H=sr.height, cx=ptCx();
+  var old=L.querySelector(".pt-path"); if(old) old.parentNode.removeChild(old); if(st.guide && st.guide.parentNode) st.guide.parentNode.removeChild(st.guide);
+  st.path=ptPickPath(cx); st.letter=pick(cx>=3?["S","M","W","2","3","8"]:["S","M","W"]); st.cxDrawn=cx; st.pathId=(st.pathId||0)+1;
+  var pts, cum, want=4+cx*1.6, tries=0;   /* redraw any line that came out too short for this complexity */
+  do{ if(tries===6) st.path="bolt"; pts=ptPathPts(st.path,120+cx*60,st.letter,cx); cum=[0]; for(var i=1;i<pts.length;i++) cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1])); }
+  while(cum[cum.length-1]<want && tries++<7);
+  st.pts=pts; st.cum=cum; st.len=cum[cum.length-1]||1; st.sPos=0;
+  var mx=34, top=78, bot=70, sx=function(p){ return mx+(p[0]+1)/2*(W-2*mx); }, sy=function(p){ return top+(1-p[1])/2*(H-top-bot); };   /* the whole screen, clear of the labels and the panel */
+  var svg='<svg class="pt-path" width="'+W+'" height="'+H+'"><polyline fill="none" stroke="'+ptRing()+'" stroke-opacity=".55" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter" points="'+pts.map(function(p){ return sx(p).toFixed(0)+","+sy(p).toFixed(0); }).join(" ")+'"/><polyline fill="none" stroke="rgba(56,200,255,.9)" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter" points="'+pts.map(function(p){ return sx(p).toFixed(0)+","+sy(p).toFixed(0); }).join(" ")+'"/></svg>';
+  L.insertAdjacentHTML("afterbegin",svg); var g=document.createElement("div"); g.className="pt-guide "+(st.type==="tracec"?"cshape":"letter"); L.appendChild(g); st.guide=g; st.sx=sx; st.sy=sy;
+  if(st.type==="tracec"){ if(st.cCol) g.style.setProperty("--gc",st.cCol[1]); }
+  else { if(!st.spell) st.spell={word:ptSpellWord(cx), t:0, ch:null}; if(st.spell.ch) g.textContent=st.spell.ch; } }
+/* the guide moves at a steady pace along the line; the Target speed control speeds it up */
+function ptTraceFrame(now, dt){ var st=PT.st; if(!st.pts) return;
+  if(st.cxDrawn!==ptCx()) ptDrawPath();
+  var lt=ptTraceLabel(); if(st.labEl && st.labEl.textContent!==lt){ st.labEl.textContent=lt; st.subEl.textContent=ptTraceSub(); }
+  var s2=S.sess, c2=cur(), left=s2?total(c2)-s2.t:99;
+  if(st.spell && left<=10 && !st.quiz && total(c2)>=20) ptQuizStart(now);
+  if(st.quiz){ ptQuizFrame(now); return; }
+  if(st.spell){ st.spell.t+=dt||0; var w0=st.spell.word, cyc=w0.length+1, idx=Math.floor(st.spell.t/2.5)%cyc, ch=idx<w0.length?w0[idx]:"\u2022";   /* one letter every 2.5 s, then a short gap, then the word again */
+    if(ch!==st.spell.ch){ st.spell.ch=ch; st.guide.textContent=ch; } }
+  var v=(0.3+0.06*st.lv)*speed(); st.sPos=((st.sPos||0)+v*(dt||0))%st.len;
+  var c=st.cum, lo=0, hi=c.length-1; while(hi-lo>1){ var mid=(lo+hi)>>1; if(c[mid]<=st.sPos) lo=mid; else hi=mid; }
+  var f=c[hi]>c[lo]?(st.sPos-c[lo])/(c[hi]-c[lo]):0, a=st.pts[lo], b=st.pts[hi], p=[a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f];
+  st.guide.style.transform="translate("+(st.sx(p)-22)+"px,"+(st.sy(p)-22)+"px)"; st.guidePt=p;
+  if(st.type==="tracec"){
+    if(!st.word || now-st.word.t>ptColorInt()) ptColorStep(now);
+    var pv=PT.prevTrial; if(pv && pv.match && !pv.scored && now-PT.trial.t0>800){ pv.scored=true; ptLog({type:"trace-color", ok:false}); }   /* a match went by unanswered */
+  }
 }
-function ptShake(){ var st=PT.st; if(!st||st.type!=="trace"||!st.word) return; var t=PT.trial; if(t && !t.scored){ t.scored=true; ptLog({type:"trace-word", ok:true, rt:performance.now()-t.t0}); toast("Caught it"); } else { ptLog({type:"trace-false"}); toast("Not that one"); } }
+
+/* ---------- v38: MOVING WORD SEARCH (VOR) ----------
+   Rows of random capital letters with real words hidden in them; each row smaller than the
+   one above (5 lines at level 1 up to 15 at level 6). The page drifts far-near-far while the
+   patient turns the head side to side. Target speed sets how fast it drifts. */
+var WS_WORDS=["APPLE","RIVER","CHAIR","HOUSE","CLOUD","TRAIN","PLANT","LIGHT","STONE","BREAD","MOUSE","HORSE","TIGER","GRAPE","PIANO","OCEAN","TABLE","SHEEP","BEACH","WATER","GREEN","SMILE","CANDLE","GARDEN","PLANET","WINDOW","ORANGE","BUTTER","CASTLE","SUMMER","DOG","CAT","SUN","MAP","HAT","CUP","BUS","FISH","BIRD","LAMP","DOOR","MILK","TREE","BOAT","KITE","RAIN","SNOW","STAR","MOON","BOOK"];
+var WS_FILL="BCDFGHJKLMNPQRSTVWXZ";   /* consonants only, so the filler rarely makes real words */
+function wsLines(){ var lv=ptLevel(); return Math.min(15,5+Math.round((lv-1)*2)); }
+function wsBuild(){ var n=wsLines(), r=Math.pow(0.36,1/Math.max(1,n-1)), used={}, rows=[];
+  for(var i=0;i<n;i++){ var sc=Math.pow(r,i), len=Math.min(40,Math.round(15/sc)), nW=len>=26?2:1, ws=[], k;
+    for(k=0;k<nW;k++){ var w, t=0; do{ w=pick(WS_WORDS); } while((used[w] || w.length>len/nW-2) && t++<40); used[w]=1; ws.push(w); }
+    var free=len-ws.reduce(function(a,w){ return a+w.length; },0), cuts=[], parts=[];
+    for(k=0;k<=nW;k++) cuts.push(Math.random()); var tot=cuts.reduce(function(a,b){ return a+b; },0); cuts=cuts.map(function(c){ return Math.floor(c/tot*free); });
+    var fill=function(m){ var o=""; for(var q=0;q<m;q++) o+=WS_FILL[Math.floor(Math.random()*WS_FILL.length)]; return o; };
+    for(k=0;k<nW;k++){ parts.push({t:fill(cuts[k])}); parts.push({t:ws[k], w:true}); } parts.push({t:fill(free-cuts.slice(0,nW).reduce(function(a,b){ return a+b; },0))});
+    rows.push({sc:sc, parts:parts}); }
+  return rows; }
+function wsStart(){ var st=PT.st; st.ws={t:0, set:-1}; wsNewPage(); }
+function wsNewPage(){ var st=PT.st, L=ptLayer(), rows=wsBuild(), of=0; st.ws.rows=rows; st.ws.show=false; st.ws.stamp=(st.ws.stamp||0)+1;
+  rows.forEach(function(r){ r.parts.forEach(function(p){ if(p.w) of++; }); });
+  st.ws.rec={type:"wsearch", found:0, of:of}; ptLog(st.ws.rec);
+  var old=L.querySelector(".ws-page"); if(old) old.parentNode.removeChild(old);
+  var pg=document.createElement("div"); pg.className="ws-page"; var sh=$("#stage").getBoundingClientRect().height, zmax=0.86+0.18+PT.st.lv*0.035, sum=rows.reduce(function(a,r){ return a+r.sc*1.18; },0);
+  var top=Math.max(14,Math.min(64,sh*0.085,(sh*0.80/zmax-sh*0.06)/sum));   /* the whole page fits, even at its nearest */
+  pg.innerHTML=rows.map(function(r){ return '<div class="ws-row" style="font-size:'+(top*r.sc).toFixed(1)+'px">'+r.parts.map(function(p){ return p.w?'<span class="w">'+p.t+'</span>':p.t; }).join("")+'</div>'; }).join("");
+  L.appendChild(pg); st.ws.el=pg; wsSync(); }
+function wsPanelHtml(){ var w=PT.st&&PT.st.ws, r=w&&w.rec; return '<span>Words found</span><button class="btn sm" data-act="ws-n" data-v="-1" aria-label="One fewer">\u2212</button><b class="ws-count">'+(r?r.found:0)+' of '+(r?r.of:0)+'</b><button class="btn sm" data-act="ws-n" data-v="1" aria-label="One more">+</button><button class="btn sm" data-act="ws-show" aria-pressed="'+!!(w&&w.show)+'">'+(w&&w.show?"Hide words":"Show words")+'</button>'; }
+function wsSync(){ var p=$("#ptPanel"); if(p && PT.st && PT.st.type==="wsearch") p.innerHTML=wsPanelHtml(); }
+function wsCount(d){ var w=PT.st&&PT.st.ws; if(!w) return; w.rec.found=Math.max(0,Math.min(w.rec.of,w.rec.found+d)); wsSync(); }
+function wsShow(){ var w=PT.st&&PT.st.ws; if(!w) return; w.show=!w.show; w.stamp++; if(w.el) w.el.querySelectorAll(".w").forEach(function(e){ e.classList.toggle("on",w.show); }); wsSync(); }
+/* far-near-far: a smooth swing in size; level makes it wider and quicker, Target speed quicker still */
+function wsZoom(){ var w=PT.st.ws, lv=PT.st.lv, per=[9,8,7,6,5.2,4.5][lv-1]/speed(), amp=0.18+lv*0.035; return 0.86+amp*Math.sin(w.t/per*6.283); }
+function wsFrame(now,dt){ var st=PT.st, w=st.ws; if(!w) return; var s2=S.sess, c=cur(), si=s2?Math.floor(s2.t/c.setSec):0;
+  if(w.set!==-1 && si!==w.set){ w.set=si; wsNewPage(); } if(w.set===-1) w.set=si;   /* a fresh page each set */
+  w.t+=dt; if(w.el) w.el.style.transform="translate(-50%,-50%) scale("+wsZoom().toFixed(3)+")"; }
+/* VR: the page in front of you, coming nearer and going farther */
+function wsVrItems(dt, running){ var st=PT.st, w=st.ws, out=[]; if(!w) return out; if(running) w.t+=dt/1000; var z=wsZoom(), d=2.0/z;
+  var tex=vrCanvasTex("wspage",1024,1024,function(g,W,H){ g.fillStyle="#fbf8ef"; g.fillRect(0,0,W,H); var n=w.rows.length, top=Math.min(92,H*0.86/w.rows.reduce(function(a,r){ return a+r.sc*1.25; },0)), y=H*0.07;
+      w.rows.forEach(function(r){ var fs=top*r.sc, txt=r.parts.map(function(p){ return p.t; }).join(""); g.font="800 "+fs.toFixed(1)+"px Courier New, monospace"; g.textBaseline="top";
+        var tw=g.measureText(txt).width, x=(W-tw)/2; r.parts.forEach(function(p){ var pw=g.measureText(p.t).width; if(p.w && w.show){ g.fillStyle="#ffe066"; g.fillRect(x-2,y-2,pw+4,fs*1.08); } g.fillStyle="#111827"; g.fillText(p.t,x,y); x+=pw; }); y+=fs*1.25; }); },"p"+w.stamp);
+  out.push({buf:"quad", M:mmul(vrPlace(0,0,d),mS(1.5,1.5,1)), tex:tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  return out; }
+/* end of the exercise: what word did the letters spell? 5 seconds to answer, then the word */
+function ptQuizStart(now){ var st=PT.st, L=ptLayer(); st.quiz={t:now, shown:false, scored:false}; st.guide.textContent="?"; if(st.wordEl) st.wordEl.style.visibility="hidden";
+  var q=document.createElement("div"); q.className="pt-quiz"; q.innerHTML='<span>What word did the letters spell?</span><br><span class="muted">Say it out loud</span><b>5</b>'; L.appendChild(q); st.quiz.el=q; }
+function ptQuizFrame(now){ var st=PT.st, q=st.quiz, el=q.el, e=now-q.t;
+  if(e<5000){ var n=String(Math.ceil((5000-e)/1000)); var b=el.querySelector("b"); if(b.textContent!==n) b.textContent=n; return; }
+  if(!q.shown){ q.shown=true; el.innerHTML='<span>The word was</span><b>'+st.spell.word+'</b>';
+    var p=$("#ptPanel"); if(p) p.innerHTML='<span>Spelled word</span><button class="btn sm" data-act="pt-spell" data-v="1">Correct</button><button class="btn sm" data-act="pt-spell" data-v="0">Wrong</button>'; } }
+function ptSpell(ok){ var st=PT.st; if(!st||!st.quiz||st.quiz.scored) return; st.quiz.scored=true; ptLog({type:"spell", ok:!!ok, word:st.spell.word}); toast(ok?"Word correct":"Word missed"); }
+function ptShake(){ var st=PT.st; if(st && st.type==="tracec") ptColorResp(); }   /* VR: a head shake answers “match” */
 /* the loop */
 function ptTick(){
   var type=ptOf(), s=S.sess, key=type?type+"|"+s.i:null;
   if(key!==PT.key){ PT.key=key; if(type) ptStart(type); else if(PT.st) ptStop(); }
   if(!type || !PT.st) return;
   var running=s.phase==="run" && !s.paused, now=performance.now(), dt=Math.min(0.1,(now-(PT.last||now))/1000); PT.last=now;
-  if(PT.st.centerEl && now-PT.st.centerT>10000){ PT.st.centerT=now; var gl2="ABCDEFHKLNOPRSTUVZ"; var ng=gl2[Math.floor(Math.random()*gl2.length)]; if(ng===PT.st.glyph) ng=gl2[(gl2.indexOf(ng)+5)%gl2.length]; PT.st.glyph=ng; PT.st.centerEl.textContent=ng; }   /* the center letter changes every 10 seconds */
+  if(PT.st.cxShown!==ptCx()) ptMeterSync();
+  if(PT.st.centerEl && now-PT.st.centerT>3000){ PT.st.centerT=now; var gl2="ABCDEFHKLNOPRSTUVZ"; var ng=gl2[Math.floor(Math.random()*gl2.length)]; if(ng===PT.st.glyph) ng=gl2[(gl2.indexOf(ng)+5)%gl2.length]; PT.st.glyph=ng; PT.st.centerEl.textContent=ng; }   /* the center letter changes every 3 seconds: say it out loud */
   if(!running){ if(PT.st) PT.st.next=Math.max(PT.st.next,now+800); return; }
   if(/^mot/.test(type)){ if(!PT.trial) ptMotStart(now); ptMotFrame(now,dt); }
-  else if(type==="trace") ptTraceFrame(now);
+  else if(/^trace/.test(type)) ptTraceFrame(now,dt);
+  else if(type==="wsearch") wsFrame(now,dt);
   else if(type==="gate"){ gateExpire(now); if(now>=PT.st.next) gatePop(now); }
   else if(now>=PT.st.next) ptPop(now);
 }
 (function loop(){ try{ ptTick(); }catch(e){ console.error(e); } requestAnimationFrame(loop); })();
 /* a patient tap counts as "seen" while a pop-up is fresh */
-document.addEventListener("pointerdown",function(e){ var st=PT.st; if(!st||/^mot/.test(st.type)||st.type==="trace") return; if(!$("#stage").contains(e.target)||e.target.closest("button,.tune,#ptPanel")) return;
+document.addEventListener("pointerdown",function(e){ var st=PT.st; if(!st||/^mot/.test(st.type)||st.type==="trace"||st.type==="wsearch") return; if(!$("#stage").contains(e.target)||e.target.closest("button,.tune,#ptPanel")) return;
+  if(st.type==="tracec"){ ptColorResp(); return; }
   if(st.type==="gate"){ gateRespond(); return; }
   var t=PT.trial; if(t && !t.scored && performance.now()-t.t0<st.dur+1200) ptScore(true, performance.now()-t.t0); });
 /* ---------- v25: HEAD-STEADY CATEGORY CATCH ----------
@@ -6036,12 +6278,17 @@ function gatePop(now){
   var sector=Math.floor(Math.random()*8), a=sector*Math.PI/4+R(-0.25,0.25), rad=st.ecc*ppd;
   var sz=Math.max(30,st.size*ppd*1.6);
   rad=Math.min(rad, Math.abs(Math.cos(a))>0.01?(sr.width/2-sz)/Math.abs(Math.cos(a)):1e9, Math.abs(Math.sin(a))>0.01?(sr.height/2-sz-34)/Math.abs(Math.sin(a)):1e9);   /* keep clear of the rule at the top */
-  var el=document.createElement("div"), col=pick(["#ffe14a","#ff3df0","#00e5ff","#39ff14","#ffffff"]);
+  var cx=ptCx(), pal=ptPalette().slice(0,cx<=2?2:4), el=document.createElement("div"), col=pick(pal);
   el.className="pt-item"; el.style.cssText="left:"+(sr.width/2+rad*Math.cos(a)-sz/2)+"px;top:"+(sr.height/2-rad*Math.sin(a)-sz/2)+"px;width:"+sz+"px;height:"+sz+"px;color:"+col+";font-size:"+(sz*0.8)+"px";
   el.innerHTML=it.shape?gateShapeSvg(it.shape,col,sz):it.txt; L.appendChild(el);
   setTimeout(function(){ el.classList.add("gone"); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },350); }, st.dur);
   PT.trial={t0:now, sector:sector, ecc:+(rad/ppd).toFixed(1), el:el, scored:false, match:it.match, item:it, az:Math.cos(a)*rad/ppd, el2:Math.sin(a)*rad/ppd, col:col, gate:true};
-  st.next=now+st.dur+R(1400,2800)-st.lv*100;
+  for(var k=1;k<PT_AT_ONCE[cx-1];k++){ var a2=R(0,6.28), r2=st.ecc*ppd*R(0.6,1.2), z2=Math.max(16,st.size*ppd*R(0.6,1.3)), dc=document.createElement("div");   /* glowing decoys: never scored */
+    r2=Math.min(r2, Math.abs(Math.cos(a2))>0.01?(sr.width/2-z2)/Math.abs(Math.cos(a2)):1e9, Math.abs(Math.sin(a2))>0.01?(sr.height/2-z2-34)/Math.abs(Math.sin(a2)):1e9);
+    dc.className="pt-pop glow"; dc.style.cssText="width:"+z2+"px;height:"+z2+"px;left:"+(sr.width/2+r2*Math.cos(a2)-z2/2)+"px;top:"+(sr.height/2-r2*Math.sin(a2)-z2/2)+"px;--pc:"+pick(pal);
+    dc.innerHTML=ptShapeSvg("circle",dc.style.getPropertyValue("--pc"),ptRing(),z2); L.appendChild(dc);
+    (function(e){ setTimeout(function(){ e.classList.add("gone"); setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); },350); }, st.dur); })(dc); }
+  st.next=now+st.dur+Math.max(500,(R(1400,2800)-st.lv*100)*PT_RATE[cx-1]);
 }
 function gateRespond(){ var t=PT.trial, st=PT.st; if(!st||st.type!=="gate") return; var now=performance.now();
   if(!t || t.scored || now-t.t0>st.dur+1300){ ptLog({type:"gate-fa", stray:true}); toast("No item to catch"); return; }
@@ -6071,13 +6318,16 @@ function gateVrItems(running){
 }
 
 /* results for the summary, progress and report */
-function ptSummary(log){ if(!log||!log.length) return null; var gt=log.filter(function(x){ return x.type==="gate"; }), gfa=log.filter(function(x){ return x.type==="gate-fa"; }).length, pop=log.filter(function(x){ return x.sector!=null && x.type!=="gate-fa"; }), mot=log.filter(function(x){ return x.found!=null; }), tw=log.filter(function(x){ return x.type==="trace-word"; });
+function ptSummary(log){ if(!log||!log.length) return null; var gt=log.filter(function(x){ return x.type==="gate"; }), gfa=log.filter(function(x){ return x.type==="gate-fa"; }).length, pop=log.filter(function(x){ return x.sector!=null && x.type!=="gate-fa" && !/^trace/.test(x.type); }), mot=log.filter(function(x){ return x.found!=null; }), tw=log.filter(function(x){ return x.type==="trace-word"; }), sp=log.filter(function(x){ return x.type==="spell"; }), wsr=log.filter(function(x){ return x.type==="wsearch"; }), tc=log.filter(function(x){ return x.type==="trace-color"; }), tfa=log.filter(function(x){ return x.type==="trace-fa"; }).length;
   var map=[0,1,2,3,4,5,6,7].map(function(k){ var a=pop.filter(function(x){ return x.sector===k; }); return a.length?[a.filter(function(x){ return x.ok; }).length,a.length]:[0,0]; });
   var rts=pop.filter(function(x){ return x.rt; }).map(function(x){ return x.rt; });
   return {n:pop.length, hits:pop.filter(function(x){ return x.ok; }).length, rt:rts.length?Math.round(rts.reduce(function(a,b){ return a+b; },0)/rts.length):null,
     maxEcc:pop.filter(function(x){ return x.ok; }).reduce(function(m,x){ return Math.max(m,x.ecc); },0), map:map,
     mot:mot.length?{trials:mot.length, found:mot.reduce(function(a,x){ return a+x.found; },0), of:mot.reduce(function(a,x){ return a+x.of; },0)}:null,
     words:tw.length?{caught:tw.filter(function(x){ return x.ok; }).length, of:tw.length}:null,
+    spell:sp.length?{ok:sp.filter(function(x){ return x.ok; }).length, of:sp.length}:null,
+    ws:wsr.length?{found:wsr.reduce(function(a,x){ return a+x.found; },0), of:wsr.reduce(function(a,x){ return a+x.of; },0), pages:wsr.length}:null,
+    colors:tc.length||tfa?{caught:tc.filter(function(x){ return x.ok; }).length, of:tc.length, fa:tfa}:null,
     gate:gt.length||gfa?{hits:gt.filter(function(x){ return x.ok; }).length, of:gt.length, fa:gfa, steady:PT.headN?Math.round((PT.headOk||0)/PT.headN*100):null}:null}; }
 function fovMapSvg(map, size){ size=size||170; var c=size/2, r=size*0.44, out='<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="Field of vision map: hit rate in eight directions">';
   map.forEach(function(m,k){ var a0=(k-0.5)*Math.PI/4, a1=(k+0.5)*Math.PI/4, pct=m[1]?m[0]/m[1]:null, col=pct==null?"#94a3b8":pct>=0.8?"#22c55e":pct>=0.5?"#facc15":"#ef4444";
@@ -6089,6 +6339,9 @@ function ptResultHtml(pt){ if(!pt) return ""; var parts=[];
   if(pt.n) parts.push('<div><strong>'+pt.hits+' of '+pt.n+'</strong><span>peripheral targets seen</span></div>'); if(pt.rt) parts.push('<div><strong>'+pt.rt+' ms</strong><span>average reaction time</span></div>');
   if(pt.maxEcc) parts.push('<div><strong>'+pt.maxEcc+'°</strong><span>farthest target seen</span></div>'); if(pt.mot) parts.push('<div><strong>'+pt.mot.found+' of '+pt.mot.of+'</strong><span>tracked dots found</span></div>');
   if(pt.gate){ parts.push('<div><strong>'+pt.gate.hits+' of '+pt.gate.of+'</strong><span>matching items caught</span></div><div><strong>'+pt.gate.fa+'</strong><span>wrong presses</span></div>'); if(pt.gate.steady!=null) parts.push('<div><strong>'+pt.gate.steady+'%</strong><span>head kept in the ring (VR)</span></div>'); }
+  if(pt.colors) parts.push('<div><strong>'+pt.colors.caught+' of '+pt.colors.of+'</strong><span>color matches caught'+(pt.colors.fa?' \u00b7 '+pt.colors.fa+' false alarm'+(pt.colors.fa>1?'s':''):'')+'</span></div>');
+  if(pt.ws) parts.push('<div><strong>'+pt.ws.found+' of '+pt.ws.of+'</strong><span>hidden words found ('+pt.ws.pages+' page'+(pt.ws.pages>1?'s':'')+')</span></div>');
+  if(pt.spell) parts.push('<div><strong>'+pt.spell.ok+' of '+pt.spell.of+'</strong><span>traced words spelled</span></div>');
   if(pt.words) parts.push('<div><strong>'+pt.words.caught+' of '+pt.words.of+'</strong><span>category words caught</span></div>');
   return '<div class="pt-result"><h3>Peripheral and tracking</h3>'+(pt.n?fovMapSvg(pt.map,170):"")+'<div class="metrics">'+parts.join("")+'</div></div>'; }
 
@@ -6099,41 +6352,50 @@ function ptVrItems(dt, running){
   if(/^mot/.test(st.type)){                                              /* dots on a sphere around you (3D: at different depths too) */
     var t=PT.trial; if(!t) return out;
     if(!PTV.trial || PTV.trial!==t){ PTV.trial=t; PTV.dots=PT.dots.map(function(d,i){ return {az:R(-60,60), el:R(-35,35), d:R(2,5), vaz:R(-1,1)*st.spd*2.2, vel:R(-1,1)*st.spd*1.4, vd:R(-0.6,0.6), tgt:d.tgt, col:d.el.style.getPropertyValue("--dc")}; }); }
-    PTV.dots.forEach(function(d,i){ if(running && t.phase==="move"){ if(Math.random()<0.02){ d.vaz=R(-1,1)*st.spd*2.2; d.vel=R(-1,1)*st.spd*1.4; } d.az+=d.vaz*dt/1000; d.el+=d.vel*dt/1000; if(Math.abs(d.az)>80) d.vaz*=-1; if(Math.abs(d.el)>55) d.vel*=-1;
-        if(st.type==="mot3d"){ d.d+=d.vd*dt/1000; if(d.d<1.4||d.d>6) d.vd*=-1; } }
-      var col=t.phase==="stop"?"#e5e7eb":(PT.dots[i]?PT.dots[i].el.style.getPropertyValue("--dc"):"#e5e7eb"), glow=t.phase==="cue"&&d.tgt&&st.type!=="motc", dist=st.type==="mot3d"?d.d:3.2, sz=dist*Math.tan(1.6*D2R)*2;
-      out.push({buf:"quad", M:mmul(vrPlace(d.az,d.el,dist),mS(sz*(glow?1.6:1),sz*(glow?1.6:1),1)), tex:texDot("ptd"+col+(glow?"g":""),col||"#e5e7eb",glow), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:true}); });
+    PTV.dots.forEach(function(d,i){ if(running && t.phase==="move"){ if(Math.random()<0.02){ d.vaz=R(-1,1)*st.spd*2.2; d.vel=R(-1,1)*st.spd*1.4; } var kq=speed(); d.az+=d.vaz*dt/1000*kq; d.el+=d.vel*dt/1000*kq; if(Math.abs(d.az)>80) d.vaz*=-1; if(Math.abs(d.el)>55) d.vel*=-1;
+        if(st.type==="mot3d"){ d.d+=d.vd*dt/1000*kq; if(d.d<1.4||d.d>6) d.vd*=-1; } }
+      var col=(PT.dots[i]?PT.dots[i].el.style.getPropertyValue("--dc"):"#7d8aa3")||"#7d8aa3", dist=st.type==="mot3d"?d.d:3.2, k=(PT.dots[i]&&PT.dots[i].s)||1, base=dist*Math.tan(1.6*D2R)*2*k, tex, sz=base;
+      if(st.type==="motc"){ if(t.phase==="stop"){ tex=texDot("ptds","#e5e7eb",false); } else { tex=texGlow("ptg"+col,col); sz=base*1.35; } }
+      else { var on=d.tgt && t.phase!=="stop" && (Math.floor(performance.now()/600)%2===0);   /* tracked dots glow on and off; the rest stay plain */
+        if(on){ tex=texGlow("ptgy","#ffe14a"); sz=base*2.1; } else tex=texDot("ptdb"+col,col,false); }
+      out.push({buf:"quad", M:mmul(vrPlace(d.az,d.el,dist),mS(sz,sz,1)), tex:tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:true}); });
+    if(st.glyph) out.push({buf:"quad", M:mmul(vrPlace(0,0,3.0),mS(0.6,0.3,1)), tex:texLetter(st.glyph), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});   /* the center letter */
     return out; }
-  if(st.type==="trace"){ return ptVrTrace(dt, running); }
+  if(/^trace/.test(st.type)){ return ptVrTrace(dt, running); }
+  if(st.type==="wsearch"){ return wsVrItems(dt, running); }
   if(st.type==="gate"){ return gateVrItems(running); }
   if(st.glyph) out.push({buf:"quad", M:mmul(vrPlace(0,0,2.5),mS(0.72,0.36,1)), tex:texLetter(st.glyph), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});   /* the center letter */
-  var tr=PT.trial; if(tr && performance.now()-tr.t0<st.dur && tr.az!=null){ var ppdS=1, az=tr.az*1.3, el=tr.el2*1.2;                   /* within comfortable side vision */
-    az=Math.max(-50,Math.min(50,az)); el=Math.max(-32,Math.min(32,el)); var sz2=2*2.5*Math.tan(st.size*D2R/2);
-    out.push({buf:"quad", M:mmul(vrPlace(az,el,2.5),mS(sz2,sz2,1)), tex:texDot("ptpop","#ffe14a",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,st.contrast], depth:false}); }
+  var tr=PT.trial; if(tr && performance.now()-tr.t0<st.dur && tr.vrPts){ tr.vrPts.forEach(function(q){                 /* every target of the wave, within comfortable side vision */
+    var az=Math.max(-50,Math.min(50,q.az*1.3)), el=Math.max(-32,Math.min(32,q.el*1.2)), sz2=2*2.5*Math.tan(Math.max(st.size,q.s)*D2R/2)*1.7;
+    out.push({buf:"quad", M:mmul(vrPlace(az,el,2.5),mS(sz2,sz2,1)), tex:texGlow("ptpop"+q.col,q.col), uvS:[1,1], uvO:[0,0], tint:[1,1,1,Math.max(0.75,st.contrast)], depth:false}); }); }
   return out;
 }
+var PT_VB={W:3.6, H:2.0, k:0.48};   /* the VR tracing board: about 74 by 45 degrees */
 /* VR laser tracing: the controller's laser lands on a board 2.4 m ahead; stay on the path */
 function ptVrTrace(dt, running){
-  var st=PT.st, out=[], D=2.4, Wb=2.6, Hb=1.6;
-  var tex=vrCanvasTex("ptpath",1024,640,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle="rgba(10,16,40,.55)"; g.fillRect(0,0,w,h); g.strokeStyle="rgba(56,200,255,.9)"; g.lineWidth=18; g.lineCap="round"; g.lineJoin="round"; g.beginPath();
-    (st.pts||[]).forEach(function(p,i){ var x=w/2+p[0]*w*0.42, y=h/2-p[1]*h*0.42; if(i) g.lineTo(x,y); else g.moveTo(x,y); }); g.stroke(); }, st.path+st.letter);
+  var st=PT.st, out=[], D=2.4, Wb=PT_VB.W, Hb=PT_VB.H, K=PT_VB.k;
+  var tex=vrCanvasTex("ptpath",1440,800,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle="rgba(10,16,40,.55)"; g.fillRect(0,0,w,h); g.strokeStyle="rgba(56,200,255,.9)"; g.lineWidth=14; g.lineCap="square"; g.lineJoin="miter"; g.beginPath();
+    (st.pts||[]).forEach(function(p,i){ var x=w/2+p[0]*w*K, y=h/2-p[1]*h*K; if(i) g.lineTo(x,y); else g.moveTo(x,y); }); g.stroke(); }, "p"+st.pathId);
   out.push({buf:"quad", M:mmul(vrPlace(0,0,D),mS(Wb,Hb,1)), tex:tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
-  if(st.guidePt) out.push({buf:"quad", M:mmul(vrPlace(Math.atan2(st.guidePt[0]*Wb*0.42,D)/D2R,Math.atan2(st.guidePt[1]*Hb*0.42,D)/D2R,D*0.99),mS(0.09,0.09,1)), tex:texDot("ptguide","#3df5a6",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
-  if(st.word){ out.push({buf:"quad", M:mmul(vrPlace(0,0,D*0.95),mS(0.66,0.2,1)), tex:texLabel("trword",st.word.w,120,640,190,true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }
-  out.push({buf:"quad", M:mmul(vrPlace(0,24,D),mS(2.1,0.2,1)), tex:texLabel("trlabel","Category: "+st.cat[0]+" · shake your head when a word fits",56,1500,145), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  if(st.quiz) out.push({buf:"quad", M:mmul(vrPlace(0,0,D*0.9),mS(1.4,0.3,1)), tex:texLabel("trquiz",st.quiz.shown?"The word was "+st.spell.word:"What word did the letters spell? "+Math.max(1,Math.ceil((5000-(performance.now()-st.quiz.t))/1000)),70,1500,320,true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  var gch=(st.spell&&st.spell.ch)||"", gcol=st.cCol?st.cCol[1]:"#ef4444";
+  if(st.type!=="tracec") out.push({buf:"quad", M:mmul(vrPlace(0,0,D*0.95),mS(0.16,0.16,1)), tex:vrCanvasTex("trbull",128,128,function(g,w,h){ g.clearRect(0,0,w,h); [[60,"#fff"],[46,"#e11d48"],[32,"#fff"],[18,"#e11d48"],[6,"#fff"]].forEach(function(r){ g.fillStyle=r[1]; g.beginPath(); g.arc(w/2,h/2,r[0],0,6.28); g.fill(); }); },"b"), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});   /* the bullseye */
+  if(st.guidePt) out.push({buf:"quad", M:mmul(vrPlace(Math.atan2(st.guidePt[0]*Wb*K,D)/D2R,Math.atan2(st.guidePt[1]*Hb*K,D)/D2R,D*0.99),mS(0.13,0.13,1)), tex:st.type==="tracec"?vrCanvasTex("trcs",128,128,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle="#fff"; g.beginPath(); g.arc(w/2,h/2,w*0.47,0,6.28); g.fill(); g.fillStyle="#0b1020"; g.beginPath(); g.arc(w/2,h/2,w*0.42,0,6.28); g.fill(); g.fillStyle=gcol; g.beginPath(); g.arc(w/2,h/2,w*0.37,0,6.28); g.fill(); },"c"+gcol):vrCanvasTex("trch",128,128,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle="#3df5a6"; g.beginPath(); g.arc(w/2,h/2,w*0.46,0,6.28); g.fill(); g.lineWidth=8; g.strokeStyle="#05261a"; g.stroke(); g.fillStyle="#05261a"; g.font="900 80px Arial"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(gch,w/2,h/2+4); }, "ch"+gch), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  if(st.word && !st.quiz){ out.push({buf:"quad", M:mmul(vrPlace(0,0,D*0.95),mS(0.66,0.2,1)), tex:texLabel("trword",st.word.w,120,640,190,true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }
+  out.push({buf:"quad", M:mmul(vrPlace(0,29,D),mS(2.1,0.2,1)), tex:texLabel("trlabel",ptTraceSub(),56,1500,145), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
   var L2=PTV.laser; if(L2){ var hit=L2.hit; if(hit){ out.push({buf:"quad", M:mmul(vrPlace(hit[0],hit[1],D*0.985),mS(0.07,0.07,1)), tex:texDot("ptlaser",L2.on?"#3df5a6":"#ff4d6d",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); } }
   return out;
 }
 /* read the controller ray and head motion each frame (called from the VR frame) */
 function ptVrInput(frame, refSpace, yawDegPerSec){
   var st=PT.st; if(!st) return;
-  if(st.type==="trace"){                                                 /* head shake: quick side-to-side turns */
+  if(/^trace/.test(st.type)){                                             /* head shake: quick side-to-side turns */
     var nowT=performance.now(), sh=PTV.shake; if(Math.abs(yawDegPerSec)>70){ var sg=yawDegPerSec>0?1:-1; if(!sh.length||sh[sh.length-1].s!==sg) sh.push({s:sg,t:nowT}); }
     while(sh.length && nowT-sh[0].t>900) sh.shift(); if(sh.length>=3){ PTV.shake=[]; ptShake(); }
     var src=null; VR.session.inputSources.forEach(function(s){ if(s.targetRaySpace && (!src||s.handedness==="right")) src=s; });
     if(src){ var pose=frame.getPose(src.targetRaySpace, refSpace); if(pose){ var m=pose.transform.matrix, o=[m[12],m[13],m[14]], dir=[-m[8],-m[9],-m[10]], O=VR.origin, c=Math.cos(VR.yaw0), s2=Math.sin(VR.yaw0);
         var lx=c*(o[0]-O[0])-s2*(o[2]-O[2]), lz=s2*(o[0]-O[0])+c*(o[2]-O[2]), ly=o[1]-O[1], dx=c*dir[0]-s2*dir[2], dz=s2*dir[0]+c*dir[2], dy=dir[1];
-        if(dz<-0.05){ var tt=(-2.4-lz)/dz, hx=lx+dx*tt, hy=ly+dy*tt, az=Math.atan2(hx,2.4)/D2R, el=Math.atan2(hy,2.4)/D2R; var bx=hx/(2.6*0.42), by=hy/(1.6*0.42), best=9;
+        if(dz<-0.05){ var tt=(-2.4-lz)/dz, hx=lx+dx*tt, hy=ly+dy*tt, az=Math.atan2(hx,2.4)/D2R, el=Math.atan2(hy,2.4)/D2R; var bx=hx/(PT_VB.W*PT_VB.k), by=hy/(PT_VB.H*PT_VB.k), best=9;
           (st.pts||[]).forEach(function(p){ var d=Math.hypot(p[0]-bx,p[1]-by); if(d<best) best=d; }); var on=best<0.06; PTV.laser={hit:[az,el], on:on}; st.trace.n++; if(on) st.trace.onPath++;
           if(st.trace.n%90===0) ptLog({type:"trace-acc", acc:Math.round(st.trace.onPath/st.trace.n*100)}); } else PTV.laser=null; } } }
 }
@@ -6154,6 +6416,7 @@ var MZ_WIRE={1:5,2:4.2,3:3.5,4:2.8,5:2.2,6:1.7};                        /* wire 
 var MZ_CX={simple:[7,3,2], medium:[10,4,3.5], complex:[14,6,5]};       /* columns, rows, wire wiggles */
 var MZ_DIST={calm:0, some:1, busy:2};
 var MZ={st:null, key:null, canvas:null};
+var MZ_TASKS={steadyrot:"space", steadyside:"coral", jpe:"circuit", fastvor:"garden"};   /* task -> look of the room it uses */
 function mzOpt(k,d){ return P&&P.prefs&&P.prefs[k]?P.prefs[k]:d; }
 function mzLayer(){ var st=$("#stage"); if(!st) return null; var L=$("#mzLayer"); if(!L){ L=document.createElement("div"); L.id="mzLayer"; st.appendChild(L); } return L; }
 function mzOf(){ var s=S.sess; if(!s) return null; var c=cur(); return c&&c.mz?c.mz:null; }
@@ -6193,6 +6456,7 @@ var MZ_STYLE={space:{wall:"#38c8ff",glow:"#9a6bff",bg:["#050a1c","#14214a"]}, ga
 function mzDraw(g, w, h, M, theme, withBg){
   var st=MZ_STYLE[theme]; g.clearRect(0,0,w,h);
   if(withBg){ var gr=g.createLinearGradient(0,0,0,h); gr.addColorStop(0,st.bg[0]); gr.addColorStop(1,st.bg[1]); g.fillStyle=gr; g.fillRect(0,0,w,h); }
+  if(M.task){ g.strokeStyle="rgba(255,255,255,.10)"; g.lineWidth=Math.max(1,h*0.003); for(var gi=1;gi<12;gi++){ g.beginPath(); g.moveTo(w*gi/12,0); g.lineTo(w*gi/12,h); g.stroke(); } for(gi=1;gi<6;gi++){ g.beginPath(); g.moveTo(0,h*gi/6); g.lineTo(w,h*gi/6); g.stroke(); } return; }   /* tasks: a faint grid only */
   var mx=w*MZ_MX, mw=w-2*mx, X=function(x){ return mx+x*mw; }, Y=function(y){ return h/2-y*h*0.46; };
   g.lineCap="round"; g.shadowColor=st.glow; g.shadowBlur=theme==="garden"?0:18;
   if(M.type==="wire"){
@@ -6213,17 +6477,20 @@ function mzDraw(g, w, h, M, theme, withBg){
   g.fillStyle="#ffd166"; g.beginPath(); g.moveTo(X(ex[0])-h*0.02,Y(ex[1])-h*0.035); g.lineTo(X(ex[0])+h*0.03,Y(ex[1])); g.lineTo(X(ex[0])-h*0.02,Y(ex[1])+h*0.035); g.closePath(); g.fill();
 }
 /* the run: wait at the start, then trace; a touch is one error; reaching the exit makes a new maze */
-function mzNew(theme){ var st=MZ.st; st.M=mzBuild(theme); st.started=false; st.touch=false; st.t0=0; MZ.gen=(MZ.gen||0)+1; st.stamp=MZ.gen; if(st.hint) st.hint.style.display=""; if(st.cv) mzDraw(st.cv.getContext("2d"),st.cv.width,st.cv.height,st.M,theme,true); }
+function mzNew(theme){ var st=MZ.st; if(st.task){ st.M={task:st.task}; MZ.gen=(MZ.gen||0)+1; st.stamp=MZ.gen; cvInit(); return; } st.M=mzBuild(theme); st.started=false; st.touch=false; st.t0=0; MZ.gen=(MZ.gen||0)+1; st.stamp=MZ.gen; if(st.hint) st.hint.style.display=""; if(st.cv) mzDraw(st.cv.getContext("2d"),st.cv.width,st.cv.height,st.M,theme,true); }
 function mzStart(theme){
-  MZ.st={theme:theme, errors:0, solved:0, times:[], contactMs:0, runMs:0, x:null, y:null};
+  var task=MZ_TASKS[theme]?theme:null; if(task) theme=MZ_TASKS[task];
+  MZ.st={theme:theme, task:task, errors:0, solved:0, times:[], contactMs:0, runMs:0, x:null, y:null};
   var L=mzLayer(); if(L){ L.innerHTML=""; var cv=document.createElement("canvas"), sr=$("#stage").getBoundingClientRect(); cv.width=Math.round(sr.width); cv.height=Math.round(sr.height); cv.className="mz-canvas"; L.appendChild(cv); MZ.st.cv=cv;
     var hint=document.createElement("div"); hint.className="pt-label"; hint.textContent="Point at the green start, then steer to the gold exit without touching the walls"; L.appendChild(hint); MZ.st.hint=hint;
     var dot=document.createElement("div"); dot.className="mz-dot"; L.appendChild(dot); MZ.st.dot=dot; }
   var d=$("#demo"); if(d) d.classList.add("pt-hide"); mzNew(theme);
+  if(MZ.st.cv && mzHead() && !VR.session) hpSetup();
 }
-function mzStop(){ var L=mzLayer(); if(L) L.innerHTML=""; var d=$("#demo"); if(d) d.classList.remove("pt-hide"); MZ.st=null; }
+function mzStop(){ if(MZ.st && MZ.st.head) hpRelease(); var L=mzLayer(); if(L) L.innerHTML=""; var d=$("#demo"); if(d) d.classList.remove("pt-hide"); MZ.st=null; }
 function mzStep(x, y, dt){                                               /* x, y in maze units; dt in ms */
   var st=MZ.st, M=st.M; if(!M || x==null) return; st.x=x; st.y=y;
+  if(st.task){ cvStep(x,y,dt); return; }
   if(!st.started){ if(mzAtStart(M,x,y)){ st.started=true; st.t0=performance.now(); if(st.hint) st.hint.style.display="none"; toast("Go"); } return; }
   st.runMs+=dt; var touch=mzTouch(M,x,y) && !mzAtExit(M,x,y);
   if(touch){ st.contactMs+=dt; if(!st.touch){ st.errors++; mzLog({type:"touch"}); mzBuzz(); } }
@@ -6236,15 +6503,164 @@ function mzBuzz(){ if(!VR.session) return; VR.session.inputSources.forEach(funct
   var t=mzOf(), s=S.sess, key=t?t+"|"+s.i:null, now=performance.now();
   if(key!==MZ.key){ MZ.key=key; if(t) mzStart(t); else if(MZ.st) mzStop(); }
   if(MZ.st){ var dt=Math.min(100,now-(MZ.last||now)); var running=s.phase==="run"&&!s.paused;
-    if(running && !VR.session && MZ.st.px!=null) mzStep(MZ.st.px,MZ.st.py,dt);
-    if(MZ.st.dot && MZ.st.cv && MZ.st.px!=null){ var cv=MZ.st.cv, w=cv.clientWidth, h=cv.clientHeight; MZ.st.dot.style.transform="translate("+(w*MZ_MX+MZ.st.px*w*(1-2*MZ_MX)-9)+"px,"+(h/2-MZ.st.py*h*0.46-9)+"px)"; MZ.st.dot.classList.toggle("hit",!!MZ.st.touch); } }
+    if(MZ.st.head && !VR.session){ var sm=+tv("hpSmooth"); if(isNaN(sm)) sm=0.35; var a=sm<=0?1:1-Math.exp(-dt/(sm*120));   /* smoothing time constant up to 120 ms */
+      MZ.st.px+= (MZ.st.hx-MZ.st.px)*a; MZ.st.py+=(MZ.st.hy-MZ.st.py)*a; }
+    if(running && !VR.session && MZ.st.px!=null && !MZ.st.need) mzStep(MZ.st.px,MZ.st.py,dt);
+    if(MZ.st.dot && MZ.st.cv && MZ.st.px!=null){ var cv=MZ.st.cv, w=cv.clientWidth, h=cv.clientHeight; MZ.st.dot.style.transform="translate("+(w*MZ_MX+MZ.st.px*w*(1-2*MZ_MX)-9)+"px,"+(h/2-MZ.st.py*h*0.46-9)+"px)"; MZ.st.dot.style.opacity=MZ.st.need?"0.35":""; MZ.st.dot.style.visibility=cvHideDot()?"hidden":""; MZ.st.dot.classList.toggle("hit",!!MZ.st.touch); } }
+  if(MZ.st && MZ.st.task){ var s3=S.sess; if(s3 && s3.phase==="run" && !s3.paused) cvTime(Math.min(100,now-(MZ.last||now))); if(MZ.st.cv && !VR.session) cvDraw2D(); }
   MZ.last=now; }catch(e){ console.error(e); } requestAnimationFrame(mzLoop); })();
+/* ---------- v38: TABLET HEAD POINTER ----------
+   A Bluetooth air mouse strapped to the forehead shows up as an ordinary mouse.
+   Its movement (not its screen position) drives a virtual pointer in maze units, so the
+   dot keeps following the head even when the system cursor reaches the screen edge.
+   Pointer Lock is used when the browser allows it; otherwise the clicker re-centers.
+   Feeds mzStep(x,y,dt) through MZ.st.px/py, exactly like touch. */
+var HP={locked:false};
+function mzHead(){ return mzOpt("mzInput","touch")==="head"; }
+function hpPrompt(show, title, text){ var st=MZ.st; if(!st) return; if(!st.hpEl){ st.hpEl=document.createElement("div"); st.hpEl.className="hp-prompt"; mzLayer().appendChild(st.hpEl); }
+  st.hpEl.style.display=show?"":"none"; if(show) st.hpEl.innerHTML="<b>"+title+"</b><span>"+text+"</span>"; }
+function hpSetup(){ var st=MZ.st; st.head=true; st.need=true; st.hx=st.px=0.5; st.hy=st.py=0; st.cv.classList.add("hp"); st.dot.classList.add("hp");
+  if(st.hint && !st.task) st.hint.textContent="Turn your head to steer the dot to the green start, then on to the gold exit without touching the walls";
+  hpPrompt(true,"Face the center of the screen","Sit comfortably with your nose pointing at the middle of the screen, then press the button on your head clicker.");
+  var ed=document.createElement("div"); ed.className="hp-edge"; ed.textContent="Face the screen center and press the clicker to re-center"; ed.style.display="none"; mzLayer().appendChild(ed); st.edgeEl=ed;
+  if(!HP.hist){ HP.hist=true; try{ history.pushState({cerebellaHP:1},""); }catch(e){} } }
+function hpCenter(){ var st=MZ.st; if(!st||!st.head) return; if(st.task && !st.need && cvClick()) return; st.hx=st.px=0.5; st.hy=st.py=0; st.edge=false; if(st.edgeEl) st.edgeEl.style.display="none";
+  if(st.need){ st.need=false; hpPrompt(false); toast("Head pointer ready"); } else toast("Re-centered");
+  var cv=st.cv; if(cv && cv.requestPointerLock && document.pointerLockElement!==cv){ try{ var p=cv.requestPointerLock(); if(p&&p.catch) p.catch(function(){}); }catch(e){} } }
+function hpRelease(){ HP.hist=false; if(document.pointerLockElement && document.exitPointerLock) try{ document.exitPointerLock(); }catch(e){} }
+document.addEventListener("pointerlockchange",function(){ var st=MZ.st; HP.locked=!!(st&&st.cv&&document.pointerLockElement===st.cv);
+  if(st && st.head && !HP.locked && !st.need && S.sess && !S.sess.over){ st.need=true; hpPrompt(true,"Head pointer paused","Face the center of the screen and press the clicker to carry on."); } });
+document.addEventListener("pointermove",function(e){ var st=MZ.st; if(!st||!st.head||!st.cv||VR.session||st.need||e.pointerType==="touch") return;
+  var r=st.cv.getBoundingClientRect(), W=r.width*(1-2*MZ_MX), H=r.height*0.46, k=+tv("hpGain")||1, ix=mzOpt("mzInvX","no")==="yes"?-1:1, iy=mzOpt("mzInvY","no")==="yes"?-1:1;
+  var ev=e.getCoalescedEvents?e.getCoalescedEvents():[]; if(!ev.length) ev=[e];
+  ev.forEach(function(q){ var dx=q.movementX||0, dy=q.movementY||0; if(Math.abs(dx)>200||Math.abs(dy)>200) return;   /* ignore jumps when the cursor wraps or the lock starts */
+    st.hx=Math.max(-0.06,Math.min(1.1,st.hx+dx*k*ix/W)); st.hy=Math.max(-1.08,Math.min(1.08,st.hy-dy*k*iy/H)); });
+  if(!HP.locked){ var atEdge=e.clientX<=2||e.clientY<=2||e.clientX>=innerWidth-3||e.clientY>=innerHeight-3;   /* no lock: the system cursor can get stuck at an edge */
+    if(atEdge && !st.edge){ st.edge=true; st.edgeEl.style.display=""; } else if(!atEdge && st.edge){ st.edge=false; st.edgeEl.style.display="none"; } } }, true);
+document.addEventListener("pointerdown",function(e){ var st=MZ.st; if(!st||!st.head||VR.session||e.pointerType==="touch") return; if(!st.cv.contains(e.target) && e.target!==st.cv) return;
+  if(e.button===0){ e.preventDefault(); hpCenter(); } }, true);
+document.addEventListener("contextmenu",function(e){ if(MZ.st && MZ.st.head) e.preventDefault(); }, true);   /* some clickers send a right-click */
+document.addEventListener("keydown",function(e){ var st=MZ.st; if(!st||!st.head||VR.session) return; if(e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if(e.key==="Enter"||e.key==="Select"){ e.preventDefault(); e.stopPropagation(); hpCenter(); } }, true);   /* the OK key on many air mice */
+window.addEventListener("popstate",function(){ if(MZ.st && MZ.st.head){ try{ history.pushState({cerebellaHP:1},""); }catch(e){} toast("Back is turned off during head-pointer mazes \u00b7 use End to finish"); } });   /* the clicker's Back button must not leave the app */
 /* finger or mouse on a tablet or computer */
-document.addEventListener("pointermove",function(e){ var st=MZ.st; if(!st||!st.cv||VR.session) return; var r=st.cv.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) return;
+document.addEventListener("pointermove",function(e){ var st=MZ.st; if(!st||!st.cv||VR.session||st.head) return; var r=st.cv.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) return;
   st.px=((e.clientX-r.left)-r.width*MZ_MX)/(r.width*(1-2*MZ_MX)); st.py=(r.height/2-(e.clientY-r.top))/(r.height*0.46); });
 function mzSummary(log){ if(!log||!log.length) return null; var sv=log.filter(function(x){ return x.type==="solved"; }), tc=log.filter(function(x){ return x.type==="touch"; }).length;
-  return {solved:sv.length, touches:tc, avg:sv.length?Math.round(sv.reduce(function(a,x){ return a+x.ms; },0)/sv.length/1000):null}; }
-function mzResultHtml(m){ if(!m) return ""; return '<div class="pt-result"><h3>Head-laser mazes</h3><div class="metrics"><div><strong>'+m.solved+'</strong><span>mazes completed</span></div><div><strong>'+m.touches+'</strong><span>wall touches</span></div>'+(m.avg?'<div><strong>'+m.avg+' s</strong><span>average time per maze</span></div>':'')+'</div></div>'; }
+  var cv=cvSummary(log); if(!sv.length && !tc) return {solved:0, touches:0, avg:null, cv:cv, mazes:false};
+  return {cv:cv, solved:sv.length, touches:tc, avg:sv.length?Math.round(sv.reduce(function(a,x){ return a+x.ms; },0)/sv.length/1000):null}; }
+function mzResultHtml(m){ if(!m) return ""; var extra=cvResultHtml(m.cv); if(m.mazes===false) return extra; return extra+'<div class="pt-result"><h3>Head-laser mazes</h3><div class="metrics"><div><strong>'+m.solved+'</strong><span>mazes completed</span></div><div><strong>'+m.touches+'</strong><span>wall touches</span></div>'+(m.avg?'<div><strong>'+m.avg+' s</strong><span>average time per maze</span></div>':'')+'</div></div>'; }
+
+
+/* ---------- v38: CERVICAL TASKS: head-steady, eyes-closed position error, fast head turns ----------
+   Work in a fixed reference frame (1600 x 900) laid over the maze units, so a target is the
+   same size and place on a tablet, a computer and the VR arc. Input is whatever drives the
+   maze laser: touch or mouse, the tablet head pointer, or the VR head direction. */
+var CVW=1600, CVH=900;
+function cvRef(x,y){ return [CVW*MZ_MX+x*CVW*(1-2*MZ_MX), CVH/2-y*CVH*0.46]; }
+function cvLv(){ return mzLevel(); }
+function cvSay(t){ try{ if(window.speechSynthesis && window.SpeechSynthesisUtterance){ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(t); u.rate=0.95; speechSynthesis.speak(u); } }catch(e){} }
+function cvBeep(f,ms){ try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; var c=CV.ac||(CV.ac=new AC()), o=c.createOscillator(), g=c.createGain(); o.frequency.value=f; g.gain.value=0.12; o.connect(g); g.connect(c.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+ms/1000); o.stop(c.currentTime+ms/1000+0.02); }catch(e){} }
+var CV={ac:null};
+var CV_STEADY={steadyrot:["Turn your body slowly to the left","Back to the middle","Turn your body slowly to the right","Back to the middle"],
+               steadyside:["Bend your head toward your left shoulder","Back to the middle","Bend your head toward your right shoulder","Back to the middle"]};
+function cvInit(){ var st=MZ.st, lv=cvLv(), t=st.task, c={state:"start", t:0};
+  if(CV_STEADY[t]){ c.half=[120,100,84,70,58,48][lv-1]; c.phase=-1; c.phDur=[8,7,6,5.5,5,4.5][lv-1]*1000; c.rec={type:"steady", task:t, inMs:0, totMs:0, exits:0, tiltL:null, tiltR:null}; mzLog(c.rec); }
+  else if(t==="jpe"){ c.r=[74,64,56,48,42,36][lv-1]; c.A=[CVW/2,CVH/2]; c.B=cvPickFar(c.A,c.r); c.state="home"; c.hold=0; }
+  else { c.cr=58; c.r=[84,72,62,54,47,40][lv-1]; c.state="wait"; c.hold=0; c.last=null; }
+  st.cvs=c; if(st.hint) st.hint.textContent=cvPrompt(); if(st.hint) st.hint.style.display="";
+  if(st.cv){ var b=document.createElement("canvas"); b.width=st.cv.width; b.height=st.cv.height; mzDraw(b.getContext("2d"),b.width,b.height,st.M,st.theme,true); st.bgCv=b; }
+  if(!st.stat){ var sd=document.createElement("div"); sd.className="cv-stat"; mzLayer().appendChild(sd); st.stat=sd; } }
+function cvPickFar(A,r){ var m=r+70, p, k=0; do{ p=[R(m,CVW-m),R(m+40,CVH-m)]; } while(Math.hypot(p[0]-A[0],p[1]-A[1])<380 && k++<60); return p; }
+/* fast head turns: a random point along the edges, never close to the last one */
+function cvEdgePt(last,r){ var m=r+40, p, k=0; do{ var side=Math.floor(Math.random()*4), f=Math.random();
+    p=side===0?[m+f*(CVW-2*m), m+20]:side===1?[CVW-m, m+20+f*(CVH-2*m-20)]:side===2?[m+f*(CVW-2*m), CVH-m]:[m, m+20+f*(CVH-2*m-20)]; }
+  while(last && Math.hypot(p[0]-last[0],p[1]-last[1])<420 && k++<60); return p; }
+function cvFromAng(yaw,pitch){ var Hh=MZ_R*Math.tan(MZ_EL*D2R), y=Math.tan(pitch*D2R)*MZ_R/(0.92*Hh); return [CVW*(yaw+MZ_ARC)/(2*MZ_ARC), CVH/2-y*CVH*0.46]; }
+function cvVrPt(c){ var th, k=0; do{ th=R(0,6.283); } while(c.lastTh!=null && Math.abs(Math.atan2(Math.sin(th-c.lastTh),Math.cos(th-c.lastTh)))<1.0 && k++<40);   /* at least ~57 degrees of direction away from the last */
+  c.lastTh=th; var amp=R(26,32); return cvFromAng(amp*Math.cos(th), Math.max(-22,Math.min(22,amp*Math.sin(th)))); }
+function cvIn(p,c,r){ return Math.hypot(p[0]-c[0],p[1]-c[1])<=r; }
+function cvHideDot(){ var st=MZ.st; return !!(st && st.task==="jpe" && st.cvs && st.cvs.state==="closed"); }
+function cvPrompt(){ var st=MZ.st, c=st&&st.cvs; if(!c) return "";
+  if(CV_STEADY[st.task]) return c.state==="start"?"Point the dot into the box to begin":(CV_STEADY[st.task][Math.max(0,c.phase)]+" \u00b7 keep the dot in the box");
+  if(st.task==="jpe") return {home:"Hold the dot on the green target and look at where the gold one is",closed:"Eyes closed: turn your head to where the gold target was, then hold still",show:"Open your eyes",seek:"Move onto the gold target and hold it for 2 seconds"}[c.state];
+  return {wait:"Eyes on the bullseye \u00b7 hold the dot in the center",go:"Hit the target fast \u00b7 eyes stay on the bullseye",back:"Back to the bullseye"}[c.state]; }
+function cvScore(){ var st=MZ.st, c=st&&st.cvs, L=(S.sess&&S.sess.mzLog)||[]; if(!c) return "";
+  if(CV_STEADY[st.task]) return "In the box "+(c.rec.totMs?Math.round(c.rec.inMs/c.rec.totMs*100):0)+"% \u00b7 exits "+c.rec.exits+(c.rec.tiltL!=null||c.rec.tiltR!=null?" \u00b7 tilt now "+Math.round(Math.abs(c.tilt||0))+"\u00b0 "+((c.tilt||0)>=0?"L":"R")+" \u00b7 best L "+Math.round(c.rec.tiltL||0)+"\u00b0 R "+Math.round(c.rec.tiltR||0)+"\u00b0":"");
+  if(st.task==="jpe"){ var j=L.filter(function(x){ return x.type==="jpe"; }); return j.length?"Trials "+j.length+" \u00b7 last error "+j[j.length-1].err.toFixed(1)+"\u00b0":"Position error trials: 0"; }
+  var v=L.filter(function(x){ return x.type==="vor"&&x.ok; }); return "Hits "+v.length+(v.length?" \u00b7 last "+v[v.length-1].mt+" ms":""); }
+function cvSetPrompt(){ var st=MZ.st; if(st && st.hint){ var t=cvPrompt(); if(st.hint.textContent!==t) st.hint.textContent=t; } }
+/* timers that run even when the dot does not move */
+function cvTime(dt){ var st=MZ.st, c=st.cvs; if(!c) return; c.t+=dt;
+  if(CV_STEADY[st.task] && c.state==="run"){ c.phT+=dt; if(c.phT>=c.phDur){ c.phT=0; c.phase=(c.phase+1)%4; cvSay(CV_STEADY[st.task][c.phase]); cvSetPrompt(); } }
+  if(st.task==="jpe" && c.state==="show" && c.t-c.t0>1800){ c.state="seek"; c.hold=0; cvSetPrompt(); }
+  if(st.task==="jpe" && c.state==="closed" && c.t-c.t0>15000) cvJpeSubmit("time");
+  if(st.task==="fastvor" && c.state==="go" && c.t-c.t0>5000){ mzLog({type:"vor", ok:false}); c.state="back"; cvBeep(220,180); cvSetPrompt(); } }
+function cvStep(x,y,dt){ var st=MZ.st, c=st.cvs; if(!c) return; var p=cvRef(x,y), lv=cvLv();
+  if(CV_STEADY[st.task]){ var inB=Math.abs(p[0]-CVW/2)<=c.half && Math.abs(p[1]-CVH/2)<=c.half;
+    if(c.state==="start"){ if(inB){ c.state="run"; c.phase=0; c.phT=0; c.inside=true; cvSay(CV_STEADY[st.task][0]); toast("Go"); cvSetPrompt(); } return; }
+    c.rec.totMs+=dt; if(inB) c.rec.inMs+=dt; else if(c.inside){ c.rec.exits++; cvBeep(330,120); } c.inside=inB; st.touch=!inB;
+    if(st.task==="steadyside" && VR.session && VR._hr!=null){ var tl=VR._hr/D2R; c.tilt=tl;   /* only tilt achieved with the dot still in the box counts */
+      if(inB){ if(tl>0) c.rec.tiltL=Math.max(c.rec.tiltL||0,tl); else c.rec.tiltR=Math.max(c.rec.tiltR||0,-tl); } }
+    return; }
+  if(st.task==="jpe"){
+    if(c.state==="home"){ if(cvIn(p,c.A,c.r)){ c.hold+=dt; if(c.hold>=1500){ c.state="closed"; c.t0=c.t; c.start=p; c.moved=false; c.still=0; c.lastP=p; cvSay("Close your eyes"); cvBeep(660,200); cvSetPrompt(); } } else c.hold=0; return; }
+    if(c.state==="closed"){ var sp=Math.hypot(p[0]-c.lastP[0],p[1]-c.lastP[1])/Math.max(1,dt)*1000; c.lastP=p;   /* reference px per second */
+      if(!c.moved && Math.hypot(p[0]-c.start[0],p[1]-c.start[1])>60) c.moved=true;
+      if(c.moved){ if(sp<40) c.still+=dt; else c.still=0; if(c.still>=1200) cvJpeSubmit("still"); } c.cur=p; return; }
+    if(c.state==="seek"){ if(cvIn(p,c.B,c.r)){ c.hold+=dt; if(c.hold>=2000){ c.A=c.B; c.B=cvPickFar(c.A,c.r); c.state="home"; c.hold=0;   /* stay on the new green target and look at the new gold one first */ cvBeep(880,120); cvSetPrompt(); } } else c.hold=0; }
+    return; }
+  /* fast head turns */
+  var C=[CVW/2,CVH/2], inC=cvIn(p,C,c.cr);
+  if(c.state==="wait"){ if(inC){ c.hold+=dt; if(c.hold>=2000){ c.tgt=VR.session?cvVrPt(c):cvEdgePt(c.last,c.r); c.last=c.tgt;   /* VR: small turns of about 30 degrees; screen: points along the edges */ c.state="go"; c.t0=c.t; c.left=null; cvBeep(740,90); cvSetPrompt(); } } else c.hold=0; return; }
+  if(c.state==="go"){ if(c.left==null && !inC) c.left=c.t-c.t0;
+    if(cvIn(p,c.tgt,c.r)){ var mt=Math.round(c.t-c.t0); mzLog({type:"vor", ok:true, rt:Math.round(c.left||0), mt:mt}); cvBeep(990,110); toast(mt+" ms"); c.state="back"; cvSetPrompt(); } return; }
+  if(c.state==="back"){ if(inC){ c.state="wait"; c.hold=0; cvSetPrompt(); } } }
+function cvJpeSubmit(how){ var st=MZ.st, c=st.cvs; if(!c||c.state!=="closed") return; var p=c.cur||c.lastP, dx=(p[0]-c.B[0])/(CVW*(1-2*MZ_MX)/(2*MZ_ARC)), dy=-(p[1]-c.B[1])/(CVH*0.46/MZ_EL);   /* about how many degrees off */
+  var err=Math.hypot(dx,dy); mzLog({type:"jpe", err:+err.toFixed(2), dx:+dx.toFixed(2), dy:+dy.toFixed(2), how:how}); c.land=p; c.state="show"; c.t0=c.t; c.hold=0; cvBeep(520,350); cvSay("Open your eyes"); toast("Off by "+err.toFixed(1)+"\u00b0"); cvSetPrompt(); }
+function cvClick(){ var st=MZ.st, c=st&&st.cvs; if(st && st.task==="jpe" && c && c.state==="closed"){ cvJpeSubmit("click"); return true; } return false; }
+/* tablet or computer: draw the frame */
+function cvDraw2D(){ var st=MZ.st, c=st.cvs, cv=st.cv; if(!c||!cv) return; var g=cv.getContext("2d"), w=cv.width, h=cv.height, sx=w/CVW, sy=h/CVH, k=Math.min(sx,sy);
+  if(st.bgCv) g.drawImage(st.bgCv,0,0); else g.clearRect(0,0,w,h);
+  var ring=function(p,r,col,fill,lw){ g.beginPath(); g.arc(p[0]*sx,p[1]*sy,r*k,0,6.283); if(fill){ g.fillStyle=fill; g.fill(); } g.lineWidth=(lw||6)*k; g.strokeStyle=col; g.stroke(); };
+  var bull=function(p,r){ [[1,"#fff"],[0.78,"#e11d48"],[0.56,"#fff"],[0.34,"#e11d48"],[0.12,"#fff"]].forEach(function(q){ g.beginPath(); g.arc(p[0]*sx,p[1]*sy,r*q[0]*k,0,6.283); g.fillStyle=q[1]; g.fill(); }); };
+  if(CV_STEADY[st.task]){ var hb=c.half, ok=c.state!=="run"||c.inside; g.lineWidth=8*k; g.strokeStyle=ok?"#3df5a6":"#ff4d6d"; g.fillStyle=ok?"rgba(61,245,166,.12)":"rgba(255,77,109,.15)";
+    g.fillRect((CVW/2-hb)*sx,(CVH/2-hb)*sy,2*hb*sx,2*hb*sy); g.strokeRect((CVW/2-hb)*sx,(CVH/2-hb)*sy,2*hb*sx,2*hb*sy); }
+  else if(st.task==="jpe"){ if(c.state!=="closed"){ ring(c.A,c.r,"#3df5a6","rgba(61,245,166,.18)"); ring(c.B,c.r,"#ffd166","rgba(255,209,102,.22)"); }
+    if(c.state==="home" && c.hold>0){ g.beginPath(); g.arc(c.A[0]*sx,c.A[1]*sy,(c.r+12)*k,-1.571,-1.571+6.283*Math.min(1,c.hold/1500)); g.lineWidth=6*k; g.strokeStyle="#fff"; g.stroke(); }
+    if(c.state==="seek" && c.hold>0){ g.beginPath(); g.arc(c.B[0]*sx,c.B[1]*sy,(c.r+12)*k,-1.571,-1.571+6.283*Math.min(1,c.hold/2000)); g.lineWidth=6*k; g.strokeStyle="#fff"; g.stroke(); }
+    if(c.land && (c.state==="show"||c.state==="seek")){ var L2=c.land; g.strokeStyle="#ff7a59"; g.lineWidth=4*k; g.setLineDash([10*k,8*k]); g.beginPath(); g.moveTo(L2[0]*sx,L2[1]*sy); g.lineTo(c.B[0]*sx,c.B[1]*sy); g.stroke(); g.setLineDash([]);
+      g.lineWidth=6*k; g.beginPath(); g.moveTo((L2[0]-16)*sx,(L2[1]-16)*sy); g.lineTo((L2[0]+16)*sx,(L2[1]+16)*sy); g.moveTo((L2[0]+16)*sx,(L2[1]-16)*sy); g.lineTo((L2[0]-16)*sx,(L2[1]+16)*sy); g.stroke(); }
+    if(c.state==="closed"){ g.fillStyle="rgba(0,0,0,.55)"; g.fillRect(0,0,w,h); g.fillStyle="#fff"; g.font="800 "+Math.round(48*k)+"px system-ui,sans-serif"; g.textAlign="center"; g.fillText("Eyes closed",w/2,h/2); } }
+  else { bull([CVW/2,CVH/2],c.cr); if(c.state==="wait" && c.hold>0){ g.beginPath(); g.arc(CVW/2*sx,CVH/2*sy,(c.cr+14)*k,-1.571,-1.571+6.283*Math.min(1,c.hold/2000)); g.lineWidth=6*k; g.strokeStyle="#fff"; g.stroke(); }
+    if(c.state==="go" && c.tgt){ var pu=1+0.08*Math.sin(c.t/90); ring(c.tgt,c.r*pu,"#ffd166","rgba(255,209,102,.35)",8); } }
+  if(st.stat){ var sc=cvScore(); if(st.stat.textContent!==sc) st.stat.textContent=sc; } }
+/* VR: the same frame on the arc */
+function cvAng(p){ var x=(p[0]-CVW*MZ_MX)/(CVW*(1-2*MZ_MX)), y=(CVH/2-p[1])/(CVH*0.46), Hh=MZ_R*Math.tan(MZ_EL*D2R);
+  return [(x*(1-2*MZ_MX)+MZ_MX)*2*MZ_ARC-MZ_ARC, Math.atan(y*0.92*Hh/MZ_R)/D2R]; }
+function cvSz(r){ return 2*MZ_R*Math.tan(r/(CVW*(1-2*MZ_MX)/(2*MZ_ARC))*D2R); }
+function cvRingTex(name,col,fill){ return vrCanvasTex(name,256,256,function(g,w,h){ g.clearRect(0,0,w,h); g.beginPath(); g.arc(w/2,h/2,w*0.44,0,6.283); if(fill){ g.fillStyle=fill; g.fill(); } g.lineWidth=w*0.06; g.strokeStyle=col; g.stroke(); }, col+fill); }
+function cvVrItems(out){ var st=MZ.st, c=st.cvs; if(!c) return; var put=function(p,r,tex){ var a=cvAng(p), z=cvSz(r); out.push({buf:"quad", M:mmul(vrPlace(a[0],a[1],MZ_R*0.98),mS(z,z,1)), tex:tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); };
+  if(CV_STEADY[st.task]){ var ok=c.state!=="run"||c.inside; put([CVW/2,CVH/2],c.half*1.1,vrCanvasTex("cvbox"+ok,256,256,function(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle=ok?"rgba(61,245,166,.14)":"rgba(255,77,109,.18)"; g.fillRect(w*0.05,h*0.05,w*0.9,h*0.9); g.lineWidth=w*0.05; g.strokeStyle=ok?"#3df5a6":"#ff4d6d"; g.strokeRect(w*0.05,h*0.05,w*0.9,h*0.9); },"b"+ok)); }
+  else if(st.task==="jpe"){ if(c.state==="closed"){ out.push({buf:"quad", M:mmul(vrPlace(0,0,MZ_R*0.9),mS(1.6,0.3,1)), tex:texLabel("cvclosed","Eyes closed",90,1100,220,true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }
+    else { put(c.A,c.r,cvRingTex("cvA","#3df5a6","rgba(61,245,166,.2)")); put(c.B,c.r,cvRingTex("cvB","#ffd166","rgba(255,209,102,.25)")); if(c.land && c.state!=="home") put(c.land,18,cvRingTex("cvL","#ff7a59","#ff7a59")); } }
+  else { put([CVW/2,CVH/2],c.cr,vrCanvasTex("trbull",128,128,function(g,w,h){ g.clearRect(0,0,w,h); [[60,"#fff"],[46,"#e11d48"],[32,"#fff"],[18,"#e11d48"],[6,"#fff"]].forEach(function(r){ g.fillStyle=r[1]; g.beginPath(); g.arc(w/2,h/2,r[0],0,6.28); g.fill(); }); },"b"));
+    if(c.state==="go" && c.tgt) put(c.tgt,c.r,cvRingTex("cvT","#ffd166","rgba(255,209,102,.4)")); } }
+/* results */
+function cvSummary(log){ var o={}, sd=log.filter(function(x){ return x.type==="steady" && x.totMs>2000; }), j=log.filter(function(x){ return x.type==="jpe"; }), v=log.filter(function(x){ return x.type==="vor"; });
+  ["steadyrot","steadyside"].forEach(function(t){ var a=sd.filter(function(x){ return x.task===t; }); if(a.length){ var tin=a.reduce(function(m,x){ return m+x.inMs; },0), tt=a.reduce(function(m,x){ return m+x.totMs; },0); o[t]={pct:Math.round(tin/tt*100), exits:a.reduce(function(m,x){ return m+x.exits; },0), sec:Math.round(tt/1000)};
+    var tL=a.filter(function(x){ return x.tiltL!=null; }), tR=a.filter(function(x){ return x.tiltR!=null; });
+    if(tL.length||tR.length){ o[t].tiltL=Math.round(Math.max.apply(null,tL.map(function(x){ return x.tiltL; }).concat([0]))); o[t].tiltR=Math.round(Math.max.apply(null,tR.map(function(x){ return x.tiltR; }).concat([0]))); } } });
+  if(j.length){ var e=j.map(function(x){ return x.err; }); o.jpe={n:j.length, mean:+(e.reduce(function(a,b){ return a+b; },0)/e.length).toFixed(1), best:+Math.min.apply(null,e).toFixed(1)}; }
+  if(v.length){ var h=v.filter(function(x){ return x.ok; }); o.vor={hits:h.length, miss:v.length-h.length, mt:h.length?Math.round(h.reduce(function(a,x){ return a+x.mt; },0)/h.length):null, rt:h.length?Math.round(h.reduce(function(a,x){ return a+x.rt; },0)/h.length):null}; }
+  return Object.keys(o).length?o:null; }
+function cvResultHtml(o){ if(!o) return ""; var m=[];
+  if(o.steadyrot) m.push('<div><strong>'+o.steadyrot.pct+'%</strong><span>in the box, body rotation \u00b7 '+o.steadyrot.exits+' exits</span></div>');
+  if(o.steadyside) m.push('<div><strong>'+o.steadyside.pct+'%</strong><span>in the box, side-bend \u00b7 '+o.steadyside.exits+' exits</span></div>');
+  if(o.steadyside && o.steadyside.tiltL!=null) m.push('<div><strong>L '+o.steadyside.tiltL+'\u00b0 \u00b7 R '+o.steadyside.tiltR+'\u00b0</strong><span>largest side-bend with the dot kept in the box (VR head tilt)</span></div>');
+  if(o.jpe) m.push('<div><strong>'+o.jpe.mean+'\u00b0</strong><span>average eyes-closed position error ('+o.jpe.n+' trials, best '+o.jpe.best+'\u00b0)</span></div>');
+  if(o.vor) m.push('<div><strong>'+(o.vor.mt!=null?o.vor.mt+' ms':'\u2014')+'</strong><span>average time to target \u00b7 '+o.vor.hits+' hits'+(o.vor.miss?', '+o.vor.miss+' missed':'')+(o.vor.rt!=null?' \u00b7 starts moving in '+o.vor.rt+' ms':'')+'</span></div>');
+  return '<div class="pt-result"><h3>Cervical control</h3><div class="metrics">'+m.join("")+'</div><small>Angles are approximate: they assume the screen fills a comfortable field of view (or the VR arc).</small></div>'; }
 
 /* ---------- VR: the maze on an arc around you, the head laser, and the environment ---------- */
 function mzArcBuf(){ if(VR.buf.mzarc) return; var v=[], N=60; for(var i=0;i<N;i++){ var a0=(-MZ_ARC+2*MZ_ARC*i/N)*D2R, a1=(-MZ_ARC+2*MZ_ARC*(i+1)/N)*D2R, u0=i/N, u1=(i+1)/N;
@@ -6272,14 +6688,16 @@ function mzVrItems(dt, running){
     out.push({buf:"quad", M:mmul(mmul(vrPlace(((az+180)%360+360)%360-180,el,o.d),mRZ(st.theme==="wire"?C2.t+o.ph:0)),mS(o.s*flap*(o.v<0?-1:1),o.s,1)), tex:mzSprite(st.theme), uvS:[1,1], uvO:[0,0], tint:[1,1,1,0.9], depth:false}); });
   if(!st.tex || st.texStamp!==st.stamp){ st.texStamp=st.stamp; st.tex=vrCanvasTex("mzmaze",2048,900,function(g,w,h){ mzDraw(g,w,h,st.M,st.theme,false); },"m"+st.theme+st.stamp); }
   out.push({buf:"mzarc", M:mmul(base,mS(MZ_R,H,MZ_R)), tex:st.tex, uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+  if(st.task) cvVrItems(out);
   /* the head laser: where your head points on the maze */
   if(VR._hy!=null){ var hy=VR._hy/D2R, hp=VR._hp/D2R, y=MZ_R*Math.tan(hp*D2R)/(H/2);
     var x=(hy+MZ_ARC)/(2*MZ_ARC); x=(x-MZ_MX)/(1-2*MZ_MX); y=y/0.92;                             /* the drawing has margins */
     st.px=x; st.py=y; if(running) mzStep(x,y,dt);
-    out.push({buf:"quad", M:mmul(vrPlace(hy,hp,MZ_R*0.97),mS(0.2,0.2,1)), tex:texDot(st.touch?"mzHitG":"mzOkG",st.touch?"#ff4d6d":"#3df5a6",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,0.55], depth:false});
-    out.push({buf:"quad", M:mmul(vrPlace(hy,hp,MZ_R*0.96),mS(0.075,0.075,1)), tex:texDot(st.touch?"mzHit":"mzOk",st.touch?"#ff4d6d":"#eafff6",false), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
-    if(!st.started) out.push({buf:"quad", M:mmul(vrPlace(0,MZ_EL+6,MZ_R),mS(1.9,0.2,1)), tex:texLabel("mzhint","Point at the green start, then steer to the gold exit",54,1500,150), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }
-  out.push({buf:"quad", M:mmul(vrPlace(0,-MZ_EL-6,MZ_R),mS(1.4,0.17,1)), tex:texLabel("mzscore","Mazes "+st.solved+" · wall touches "+st.errors,52,1200,140), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+    if(!cvHideDot()) out.push({buf:"quad", M:mmul(vrPlace(hy,hp,MZ_R*0.97),mS(0.2,0.2,1)), tex:texDot(st.touch?"mzHitG":"mzOkG",st.touch?"#ff4d6d":"#3df5a6",true), uvS:[1,1], uvO:[0,0], tint:[1,1,1,0.55], depth:false});
+    if(!cvHideDot()) out.push({buf:"quad", M:mmul(vrPlace(hy,hp,MZ_R*0.96),mS(0.075,0.075,1)), tex:texDot(st.touch?"mzHit":"mzOk",st.touch?"#ff4d6d":"#eafff6",false), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+    if(st.task) out.push({buf:"quad", M:mmul(vrPlace(0,MZ_EL+6,MZ_R),mS(1.9,0.2,1)), tex:texLabel("cvhint",cvPrompt(),54,1500,150), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
+    else if(!st.started) out.push({buf:"quad", M:mmul(vrPlace(0,MZ_EL+6,MZ_R),mS(1.9,0.2,1)), tex:texLabel("mzhint","Point at the green start, then steer to the gold exit",54,1500,150), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false}); }
+  out.push({buf:"quad", M:mmul(vrPlace(0,-MZ_EL-6,MZ_R),mS(1.4,0.17,1)), tex:texLabel("mzscore",st.task?cvScore():"Mazes "+st.solved+" · wall touches "+st.errors,52,1200,140), uvS:[1,1], uvO:[0,0], tint:[1,1,1,1], depth:false});
   return out;
 }
 
@@ -7281,10 +7699,18 @@ window.addEventListener("beforeunload",function(e){ if(P && P.guest && guestHasD
 })();
 </script>
 <script>
-/* offline support when served from a web address (ignored when opened as a local file) */
-if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
-  window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
-}
+/* Hosted build: offline support and updates (service worker sw.js, version cerebella-v38) */
+(function(){ if(!("serviceWorker" in navigator) || location.protocol==="file:") return;
+  window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").then(function(reg){
+    function ready(w){ if(!w) return; w.addEventListener("statechange",function(){ if(w.state==="installed" && navigator.serviceWorker.controller) banner(); }); }
+    if(reg.waiting && navigator.serviceWorker.controller) banner(); reg.addEventListener("updatefound",function(){ ready(reg.installing); });
+    setInterval(function(){ reg.update().catch(function(){}); }, 30*60*1000);
+  }).catch(function(){}); });
+  function banner(){ if(document.getElementById("swUpd")) return; var b=document.createElement("button"); b.id="swUpd"; b.type="button";
+    b.textContent="A new version of Cerebella is ready \u00b7 tap to update"; b.style.cssText="position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;border:0;font:700 15px system-ui,sans-serif;background:#3df5a6;color:#05261a;box-shadow:0 6px 24px rgba(0,0,0,.4);cursor:pointer";
+    b.onclick=function(){ navigator.serviceWorker.getRegistration().then(function(r){ if(r&&r.waiting) r.waiting.postMessage("skip"); }); navigator.serviceWorker.addEventListener("controllerchange",function(){ location.reload(); }); setTimeout(function(){ location.reload(); },1500); };
+    document.body.appendChild(b); }
+})();
 </script>
 </body>
 </html>

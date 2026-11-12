@@ -1,31 +1,16 @@
 {
-  "name": "Cerebella: find your balance",
+  "name": "Cerebella VR",
   "short_name": "Cerebella",
-  "description": "Guided vestibular therapy exercises that run offline.",
+  "description": "A Bala North Exclusive Experience. Vestibular and visual-motion therapy. © Dr. Alexander Riccardi / Bala North, all rights reserved.",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "any",
-  "background_color": "#070f26",
-  "theme_color": "#167070",
+  "background_color": "#071026",
+  "theme_color": "#071026",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
